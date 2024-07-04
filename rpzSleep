@@ -1,0 +1,48 @@
+#!/bin/sh
+set -e
+
+#	Usage: 	rpzSleep.sh <sleep time>
+#		default <sleep time> is 5 minutes
+#
+#	Pause for NUMBER seconds.  SUFFIX may be 's' for seconds,
+#	'm' for minutes, 'h' for hours or 'd' for days.
+#
+#	v03 on 2024-06-23
+#
+
+###############     Functions     ###############
+
+#	send message to message log
+msg_log () {
+	if /usr/bin/tty --silent ; then
+		echo "${tagName}:" "$*"
+	else
+		/usr/bin/logger --tag "${tagName}" "$*"
+	fi
+}
+
+###############       Main        ###############
+
+tagName="unbound"
+
+sleepTime="${1:-5m}"			#	default to sleep for 5m (5 minutes)
+
+zoneList=$( /usr/sbin/unbound-control list_auth_zones | /usr/bin/awk '{print $1}' )
+
+for zone in ${zoneList} ; do
+	/usr/bin/printf "disable ${zone}\t"
+	/usr/sbin/unbound-control rpz_disable "${zone}"
+done
+
+msg_log "info: rpz: disabled all zones for ${sleepTime}"
+
+/bin/sleep "${sleepTime}"
+
+for zone in ${zoneList} ; do
+	/usr/bin/printf "enable ${zone}\t"
+	/usr/sbin/unbound-control rpz_enable "${zone}"
+done
+
+msg_log "info: rpz: enabled all zones"
+
+exit
