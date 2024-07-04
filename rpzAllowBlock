@@ -47,9 +47,9 @@ blockZoneFile="/etc/unbound/zonefiles/block.rpz"	#	output file for RPZ block
 #	does an allowList exist?
 if [[ -s "${allowList}" ]] ; then
 	#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
-	actionList=$( /usr/bin/awk '{$1=$1};1' "${allowList}" | 
-		/bin/sed "/^[^;$].*[[:alnum:]]/ s|$|	CNAME	rpz-passthru.|" )					
-	
+	actionList=$( /usr/bin/awk '{$1=$1};1' "${allowList}" |
+		/bin/sed "/^[^;$].*[[:alnum:]]/ s|$|	CNAME	rpz-passthru.|" )
+
 	#	make the zone file
 	msg_log "rpz: create zonefile for allow list"
 	/bin/cat <<-EOF > "${allowZoneFile}"
@@ -60,11 +60,11 @@ if [[ -s "${allowList}" ]] ; then
 	;
 	${actionList}
 	EOF
-	
+
 	#	reload the zone that was just updated
 	zoneBase=$( basename "${allowZoneFile}" )
 	/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
-	
+
 	# 	/usr/bin/logger -t unbound "info: rpz: ${zoneBase} file is NEW"
 	msg_log "info: rpz: ${zoneBase} file is NEW"
 fi
@@ -74,9 +74,9 @@ fi
 #	does an blockList exist?
 if [[ -s "${blockList}" ]] ; then
 	#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
-	actionList=$( /usr/bin/awk '{$1=$1};1' "${blockList}" | 
+	actionList=$( /usr/bin/awk '{$1=$1};1' "${blockList}" |
 		/bin/sed "/^[^;].*[[:alnum:]]/ s|$|	CNAME	.|" )
-	
+
 	msg_log "rpz: create zonefile for block list"
 	/bin/cat <<-EOF > "${blockZoneFile}"
 	; Name:				Block List
@@ -86,11 +86,11 @@ if [[ -s "${blockList}" ]] ; then
 	;
 	${actionList}
 	EOF
-	
+
 	#	reload the zone that was just updated
 	zoneBase=$( basename "${blockZoneFile}" )
 	/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
-	
+
 	# 	/usr/bin/logger -t unbound "info: rpz: ${zoneBase} file is NEW"
 	msg_log "info: rpz: ${zoneBase} file is NEW"
 fi
