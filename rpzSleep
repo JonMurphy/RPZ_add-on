@@ -1,14 +1,25 @@
-#!/bin/sh
-set -e
+#!/bin/bash
+###############################################################################
+#                                                                             #
+#  IPFire.org - A linux based firewall                                        #
+#  Copyright (C) 2024  IPFire Team  <info@ipfire.org>                         #
+#                                                                             #
+#  This program is free software: you can redistribute it and/or modify       #
+#  it under the terms of the GNU General Public License as published by       #
+#  the Free Software Foundation, either version 3 of the License, or          #
+#  (at your option) any later version.                                        #
+#                                                                             #
+#  This program is distributed in the hope that it will be useful,            #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#  GNU General Public License for more details.                               #
+#                                                                             #
+#  You should have received a copy of the GNU General Public License          #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                             #
+###############################################################################
 
-#	Usage: 	rpzSleep.sh <sleep time>
-#		default <sleep time> is 5 minutes
-#
-#	Pause for NUMBER seconds.  SUFFIX may be 's' for seconds,
-#	'm' for minutes, 'h' for hours or 'd' for days.
-#
-#	v03 on 2024-06-23
-#
+#	v03 on 2024-07-04
 
 ###############     Functions     ###############
 
@@ -29,16 +40,16 @@ sleepTime="${1:-5m}"			#	default to sleep for 5m (5 minutes)
 
 zoneList=$( /usr/sbin/unbound-control list_auth_zones | /usr/bin/awk '{print $1}' )
 
-for zone in ${zoneList} ; do
+for zone in ${zoneList} ; do 
 	/usr/bin/printf "disable ${zone}\t"
 	/usr/sbin/unbound-control rpz_disable "${zone}"
-done
+done 
 
 msg_log "info: rpz: disabled all zones for ${sleepTime}"
 
 /bin/sleep "${sleepTime}"
 
-for zone in ${zoneList} ; do
+for zone in ${zoneList} ; do 
 	/usr/bin/printf "enable ${zone}\t"
 	/usr/sbin/unbound-control rpz_enable "${zone}"
 done
