@@ -41,11 +41,10 @@ The `rpzAllowBlock` application loads custom allow lists and blocks lists into u
 Sometimes outside RPZ lists will block a website that requires access.  Allowed items can be added to this list.
 
 Edit the `/var/ipfire/rpz/allowlist` and add the needed websites:
-
 <img width="981" alt="Screen Shot 2024-07-04 at 4 08 32 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/6c21e799-a3d5-4a6f-8c66-4875e51d0b7e">
 
+#### Block list
 The block list operates in the same way and is located at `/var/ipfire/rpz/blocklist`:
-
 <img width="977" alt="Screen Shot 2024-07-04 at 4 23 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/0a35b5e7-fb0e-413b-aaa7-cd9a5da3f969">
 
 
@@ -55,28 +54,34 @@ rpzAllowBlock
 ```
 
 
-
 ### Create a config file for RPZ
+`rpzConfig` assists in creating, removing or replacing an RPZ config file
 
 ```
-Usage: 	rpzConfig  [options] <name>  <url>
-  Assists in creating, removing or replacing an RPZ config file
+Usage: 	rpzConfig  <options> <name> <url>
 
 Options:
---add <name> <url>   adds new RPZ config file by RPZ name
+  add <name> <url>     adds new RPZ config file by RPZ name
 
---remove <name>      removes unneeded RPZ files by RPZ name
+  remove <name> <url>  removes unneeded RPZ files by RPZ name
 
---replace <name>     replaces an existing RPZ files with a new config file
+  replace <name>       replaces an existing RPZ files with a new config file
 
-<name>               unique alpha-numeric name for the RPZ file.
-                       This name appears in the message log and
+    <name>             unique alpha-numeric name for the RPZ file.  This name appears in the message log and
                        is the basename for the config file. e.g., threatfox, urlhaus, PopUpAdsHZ
 
-<url>                URL for RPZ.  Must be in a format similar to
-                       https://example.com/path/filename.  Other protocols such
-                       as file://, ftp://, etc. will not work.
+    <url>              URL for RPZ.  Must be in a format similar to https://example.com/path/filename.
+                       Other protocols such as file://, ftp://, etc. will not work.
 ```
+
+Example command:
+```
+rpzConfig add MxUltimateHZ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/rpz/ultimate.txt
+```
+Example response:
+<img width="1005" alt="Screen Shot 2024-07-04 at 4 51 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/a27f74b6-db45-4e91-a307-3ddb55cb82e2">
+
+
 
 **Note**: whenever a RPZ config file is added, removed, or replaced, the upbound reload (i.e., `unbound-control reload`) is run.  This loads all of the new settings.  Keep in mind this may pause DNS up to ~60 seconds depending on the size of the RPZ files.  Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 1,000,000 lines of RPZ files (total for all RPZ files) is NOT recommended.
 
@@ -85,17 +90,24 @@ Options:
 Locates RPZ names from the message logs and sort by hits.  Selecting all message logs (1 year or 53 log files) may take ~60 seconds to complete.
 
 ```
-Usage: 	rpzMetrics.sh <number of message logs>
+Usage: 	rpzMetrics <number of message logs>
     default <number of message logs> is 2
 ```
+
+Example response:
+<img width="977" alt="342484069-00eb5bcb-de28-4da7-b050-d5bff3f93b41" src="https://github.com/JonMurphy/RPZ/assets/15616372/a79357af-24f2-432a-abd2-6be153c8c252">
+
 
 ### Disable RPZ for N time
 
 Pause for NUMBER seconds. SUFFIX may be 's' for seconds, 'm' for minutes, 'h' for hours or 'd' for days.
 ```
-Usage: 	rpzSleep.sh <sleep time>
+Usage: 	rpzSleep <sleep time>
 	default <sleep time> is 5 minutes
 ```
+
+Example response:
+<img width="977" alt="342118230-9f753be5-80d7-4da5-8e56-023829207185" src="https://github.com/JonMurphy/RPZ/assets/15616372/d86d41d2-ded9-4025-b359-1af113438a61">
 
 
 ## Links
