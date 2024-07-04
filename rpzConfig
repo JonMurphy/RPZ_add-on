@@ -1,0 +1,133 @@
+#!/bin/sh
+###############################################################################
+#                                                                             #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2024  IPFire Team  <info@ipfire.org>                          #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+#	v17 - 2024-07-04
+
+###############     Functions     ###############
+
+msg_log () {
+	if tty --silent ; then
+		echo "${tagName}:" "$*"
+	else
+		/usr/bin/logger --tag "${tagName}" "$*"
+	fi
+}
+
+
+###############       Main        ###############
+
+tagName="unbound"
+
+#	to add or remove or replace a config file
+theAction="${1}"											#	input action
+
+theName="${2}"												#	input RPZ name
+#	is this a valid name?  no `+`, maybe be other characers
+if ! echo "${theName}" | grep --quiet --extended-regexp '^[[:alnum:]]+$' ; then
+	msg_log "error: rpz: the NAME is not valid: \"${theName}\". exit."
+	exit 1
+fi
+
+theURL="${3}"												#	input RPZ URL
+#	checked below.  can be blank for removal
+
+rpzConfig="/etc/unbound/local.d/${theName}.rpz.conf"		#	output zone conf file
+rpzFile="/etc/unbound/zonefiles/${theName}.rpz"				#	output for RPZ file
+
+
+case "${theAction}" in
+	replace | '--replace')
+		msg_log "rpz: replace existing config file \"${theName}.rpz.conf\""
+		#	trash config file and rpz file
+		/bin/rm --verbose "${rpzConfig}"
+		/bin/rm --verbose "${rpzFile}"
+		#	fall through to "--add"
+		;&
+
+	add | '--add' )
+		#	does this config already exist?  If yes, then exit
+		if [[ -f "${rpzConfig}" ]] ; then
+			msg_log "rpz: ${rpzConfig} already exists. exit"
+			exit 0
+		fi
+
+		#	is this a valid URL?
+		regex='^https://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]'
+		if ! [[ "${theURL}" =~ $regex ]]
+		then
+			msg_log "error: rpz: the URL is not valid: \"${theURL}\". exit."
+			exit 1
+		fi
+
+		#	create the zone config file
+		msg_log "rpz: add config file \"${theName}.rpz.conf\""
+		cat <<-EOF > "${rpzConfig}"
+		rpz:
+		    name:					${theName}.rpz
+		    zonefile:				/etc/unbound/zonefiles/${theName}.rpz
+		    url:  ${theURL}
+		    rpz-action-override:	nxdomain
+		    rpz-log:				yes
+		    rpz-log-name:			${theName}
+		    rpz-signal-nxdomain-ra:	yes
+		EOF
+
+		#	set-up zone file
+		/usr/bin/touch "${rpzFile}"
+		#	unbound requires these settings for rpz files
+		/bin/chown --verbose nobody:nobody "${rpzFile}"
+		/bin/chmod --verbose 644 "${rpzFile}"
+
+		#  check the above config files
+		msg_log "rpz: checking for errors with \"unbound-checkconf\""
+		/usr/sbin/unbound-checkconf
+		exit_code=$?
+		if [[ ${exit_code} -ne 0 ]] ; then
+			msg_log "error: rpz: unbound-checkconf for \"${theName}\". exit."
+			exit $exit_code
+		fi
+		;;
+
+	remove | '--remove' )
+		#	trash config file & rpz file
+		msg_log "rpz: remove config file & rpz file \"${theName}\""
+		/bin/rm --verbose "${rpzConfig}"
+		/bin/rm --verbose "${rpzFile}"
+		;;
+
+	*)
+		msg_log "missing or incorrect parameter"
+		msg_log "Usage:  rpzConfig.sh [ACTION] [NAME] [URL]"
+		exit 1
+		;;
+
+esac
+
+#	reload the zone that was just updated
+msg_log  "rpz: running \"unbound-control reload\""
+/usr/sbin/unbound-control reload
+exit_code=$?
+if [[ ${exit_code} -ne 0 ]] ; then
+	msg_log "error: rpz: unbound-control \"${theName}\". exit."
+	exit $exit_code
+fi
+
+exit
