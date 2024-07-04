@@ -1,0 +1,107 @@
+#!/bin/bash
+###############################################################################
+#                                                                             #
+#  IPFire.org - A linux based firewall                                        #
+#  Copyright (C) 2024  IPFire Team  <info@ipfire.org>                         #
+#                                                                             #
+#  This program is free software: you can redistribute it and/or modify       #
+#  it under the terms of the GNU General Public License as published by       #
+#  the Free Software Foundation, either version 3 of the License, or          #
+#  (at your option) any later version.                                        #
+#                                                                             #
+#  This program is distributed in the hope that it will be useful,            #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#  GNU General Public License for more details.                               #
+#                                                                             #
+#  You should have received a copy of the GNU General Public License          #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                             #
+###############################################################################
+
+#	v18 on 2024-07-04
+
+###############     Functions     ###############
+
+msg_log () {
+	if /usr/bin/tty --silent ; then
+		echo "${tagName}:" "$*"
+	else
+		/usr/bin/logger --tag "${tagName}" "$*"
+	fi
+}
+
+
+###############       Main        ###############
+
+tagName="unbound"
+
+allowList="/var/ipfire/rpz/allowlist"				#	user list of allowed domains
+blockList="/var/ipfire/rpz/blocklist"				#	user list of blocked domains
+
+allowZoneFile="/etc/unbound/zonefiles/allow.rpz"	#	output file for RPZ allow
+blockZoneFile="/etc/unbound/zonefiles/block.rpz"	#	output file for RPZ block
+
+
+##	build allow RPZ list
+#	does an allowList exist?
+if [[ -s "${allowList}" ]] ; then
+	#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
+	actionList=$( /usr/bin/awk '{$1=$1};1' "${allowList}" | 
+		/bin/sed "/^[^;$].*[[:alnum:]]/ s|$|	CNAME	rpz-passthru.|" )					
+	
+	#	make the zone file
+	msg_log "rpz: create zonefile for allow list"
+	/bin/cat <<-EOF > "${allowZoneFile}"
+	; Name:				Allow List
+	; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
+	;
+	;	domains with actions list
+	;
+	${actionList}
+	EOF
+	
+	#	reload the zone that was just updated
+	zoneBase=$( basename "${allowZoneFile}" )
+	/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
+	
+	# 	/usr/bin/logger -t unbound "info: rpz: ${zoneBase} file is NEW"
+	msg_log "info: rpz: ${zoneBase} file is NEW"
+fi
+
+
+##	build block RPZ list
+#	does an blockList exist?
+if [[ -s "${blockList}" ]] ; then
+	#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
+	actionList=$( /usr/bin/awk '{$1=$1};1' "${blockList}" | 
+		/bin/sed "/^[^;].*[[:alnum:]]/ s|$|	CNAME	.|" )
+	
+	msg_log "rpz: create zonefile for block list"
+	/bin/cat <<-EOF > "${blockZoneFile}"
+	; Name:				Block List
+	; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
+	;
+	;	domains with actions list
+	;
+	${actionList}
+	EOF
+	
+	#	reload the zone that was just updated
+	zoneBase=$( basename "${blockZoneFile}" )
+	/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
+	
+	# 	/usr/bin/logger -t unbound "info: rpz: ${zoneBase} file is NEW"
+	msg_log "info: rpz: ${zoneBase} file is NEW"
+fi
+
+#  check above rpz files
+msg_log "info: rpz: checking for errors with \"unbound-checkconf\""
+/usr/sbin/unbound-checkconf
+exit_code=$?
+if [[ ${exit_code} -ne 0 ]] ; then
+	msg_log "error: rpz: unbound-checkconf. exit."
+	exit $exit_code
+fi
+
+exit
