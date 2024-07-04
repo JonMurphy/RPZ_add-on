@@ -1,0 +1,89 @@
+###############################################################################
+#                                                                             #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2024  IPFire Team  <info@ipfire.org>                          #
+#                                                                             #
+# This program is free software: you can redistribute it and/or modify        #
+# it under the terms of the GNU General Public License as published by        #
+# the Free Software Foundation, either version 3 of the License, or           #
+# (at your option) any later version.                                         #
+#                                                                             #
+# This program is distributed in the hope that it will be useful,             #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
+# GNU General Public License for more details.                                #
+#                                                                             #
+# You should have received a copy of the GNU General Public License           #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
+#                                                                             #
+###############################################################################
+
+###############################################################################
+# Definitions
+###############################################################################
+
+include Config
+
+SUMMARY    = response policy zone - RPZ reputation system for unbound DNS
+
+VER        = 1.0.0
+
+THISAPP    = rpz-$(VER)
+DIR_APP    = $(DIR_SRC)/$(THISAPP)
+TARGET     = $(DIR_INFO)/$(THISAPP)
+
+PROG       = rpz
+PAK_VER    = 1
+
+DEPS       =
+
+SERVICES   =
+
+###############################################################################
+# Top-level Rules
+###############################################################################
+
+install : $(TARGET)
+
+check :
+
+download :
+
+b2 :
+
+dist:
+	@$(PAK)
+
+###############################################################################
+# Installation Details
+###############################################################################
+
+$(TARGET) :
+	@$(PREBUILD)
+	@rm -rf $(DIR_APP)
+	
+	#	install RPZ scripts
+	install -v -m 755 \
+		$(DIR_CONF)/rpz/{rpzAllowBlock,rpzConfig} \
+		$(DIR_CONF)/rpz/{rpzMetrics,rpzSleep} \
+		-t /usr/sbin
+
+	# Install settings folder and two empty files
+	mkdir -pv /var/ipfire/rpz
+	touch /var/ipfire/rpz/allowlist
+	touch /var/ipfire/rpz/blocklist
+
+	# Add conf file to /etc directory
+	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
+
+	#	create zonefiles directory for the RPZ files and two empty RPZ files to 
+	#	 avoid an error
+	mkdir -pv /etc/unbound/zonefiles
+	touch /etc/unbound/zonefiles/allow.rpz
+	touch /etc/unbound/zonefiles/block.rpz
+
+	# Install backup definition
+	cp -vf $(DIR_CONF)/backup/includes/rpz /var/ipfire/backup/addons/includes/rpz
+
+	@rm -rf $(DIR_APP)
+	@$(POSTBUILD)
