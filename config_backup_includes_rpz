@@ -1,0 +1,4 @@
+/var/ipfire/rpz/allowlist
+/var/ipfire/rpz/blocklist
+/etc/unbound/zonefiles/allow.rpz
+/etc/unbound/zonefiles/block.rpz
