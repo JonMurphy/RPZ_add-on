@@ -2,7 +2,7 @@
 RPZ add-on for IPFire
 
 
-#### To test
+#### Install (test version only)
 
 ```
 cd /opt/pakfire/tmp/
@@ -14,5 +14,9 @@ ls -l
 cp -v ROOTFILES /opt/pakfire/db/rootfiles/rpz
 
 ./install.sh
+
+#  Restart unbound to load the recently changed config file
+
+/etc/init.d/unbound restart
 ```
 
