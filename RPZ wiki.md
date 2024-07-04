@@ -58,9 +58,9 @@ rpzAllowBlock
 `rpzConfig` assists in creating, removing or replacing an RPZ config file
 
 ```
-Usage: 	rpzConfig  <options> <name> <url>
+Usage: 	rpzConfig  <action> <name> <url>
 
-Options:
+Actions:
   add <name> <url>     adds new RPZ config file by RPZ name
 
   remove <name> <url>  removes unneeded RPZ files by RPZ name
