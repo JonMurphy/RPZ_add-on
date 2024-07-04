@@ -2,9 +2,7 @@
 
 Response Policy Zones (RPZ) is a mechanism that makes it possible to define your local policies in a standardised way and load  policies from external sources.  [^1].  The base functionality of blocking DNS is similar to piHole but without the pretty graphics.  (there are no plans to add the pretty grphics).
 
-
-
-
+Note: Domains blocked by RPZ are not DROPped or REJECTed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If your user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed you may be better off of using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
 
 ## Installation
 Note: The test version of the RPZ add-on is installed manually until approved by the IPFire Developers.  It is installed similar to this method:
@@ -21,11 +19,11 @@ pakfire install rpz
 </strike>
 	
 ## Usage
-There is no web interface for this add-on. To run this add-on open the console, or terminal and access the IPFire box via SSH.  There are four simple scripts available for set-up:
+There is no web interface for this add-on. To run this add-on open the serial console, or the local terminal and access the IPFire box via SSH.  There are four simple scripts available for set-up:
 
-[rpzAllowBlock](RPZ%20wiki.md#custom-allow-list-or-block-list) - Loads custom allow and blocks lists into unbound RPZ
+[rpzAllowBlock](RPZ%20wiki.md#custom-allow-list-or-block-list) - Loads custom allow lists and blocks lists into unbound RPZ
 
-[rpzConfig](RPZ%20wiki.md) - Assists in creating, removing or replacing an RPZ config file
+[rpzConfig](RPZ%20wiki.md) - Create, remove or replace an external RPZ config file 
 
 [rpzMetrics](RPZ%20wiki.md) - Locates RPZ names from the message logs and sort by hits.  Selecting all logs (1 year) may take ~60 seconds to complete.
 
@@ -33,14 +31,32 @@ There is no web interface for this add-on. To run this add-on open the console, 
 
 PS - I am looking for someone to assist with a WebGUI.
 
-Note: Domains blocked by RPZ are not DROPped or REJECTed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If your user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed you may be better off of using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
 
-## Custom allow list or block list
 
-Usage: 	rpzAllowBlock
-  Loads custom allow and blocks lists into unbound RPZ
+### Custom allow list or block list
 
-## Create a config file for RPZ
+The `rpzAllowBlock` application loads custom allow lists and blocks lists into unbound RPZ.  Update the lists first and then run the `rpzAllowBlock` command. 
+
+#### Allow list
+Sometimes outside RPZ lists will block a website that requires access.  Allowed items can be added to this list.
+
+Edit the `/var/ipfire/rpz/allowlist` and add the needed websites:
+
+<img width="981" alt="Screen Shot 2024-07-04 at 4 08 32 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/6c21e799-a3d5-4a6f-8c66-4875e51d0b7e">
+
+The block list operates in the same way and is located at `/var/ipfire/rpz/blocklist`:
+
+<img width="977" alt="Screen Shot 2024-07-04 at 4 23 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/0a35b5e7-fb0e-413b-aaa7-cd9a5da3f969">
+
+
+After saving the lists, launch this from the command line to load these files into unbound:
+```
+rpzAllowBlock
+```
+
+
+
+### Create a config file for RPZ
 
 ```
 Usage: 	rpzConfig  [options] <name>  <url>
@@ -62,18 +78,18 @@ Options:
                        as file://, ftp://, etc. will not work.
 ```
 
-**Note**: whenever a RPZ config file is added, removed, or replaced, the upbound reload (i.e., `unbound-control reload`) is run.  This loads all of the new settings.  Keep in mind this may pause DNS up to ~60 seconds depending on the size of the RPZ files.  Large RPZ files will slow down the unbound reload time.
+**Note**: whenever a RPZ config file is added, removed, or replaced, the upbound reload (i.e., `unbound-control reload`) is run.  This loads all of the new settings.  Keep in mind this may pause DNS up to ~60 seconds depending on the size of the RPZ files.  Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 1,000,000 lines of RPZ files (total for all RPZ files) is NOT recommended.
 
-## Metrics of RPZ usage
+### Metrics of RPZ usage
 
-Locates RPZ names from the message logs and sort by hits.  Selecting all logs (1 year) may take ~60 seconds to complete.
+Locates RPZ names from the message logs and sort by hits.  Selecting all message logs (1 year or 53 log files) may take ~60 seconds to complete.
 
 ```
 Usage: 	rpzMetrics.sh <number of message logs>
     default <number of message logs> is 2
 ```
 
-## Disable RPZ for N time
+### Disable RPZ for N time
 
 Pause for NUMBER seconds. SUFFIX may be 's' for seconds, 'm' for minutes, 'h' for hours or 'd' for days.
 ```
