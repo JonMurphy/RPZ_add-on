@@ -76,9 +76,10 @@ $(TARGET) :
 	# Add conf file to /etc directory
 	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
 
-	#	create zonefiles directory for the RPZ files and two empty RPZ files to 
-	#	 avoid an error
+	#	create zonefiles directory for the RPZ files and add two empty RPZ 
+	#	  files to avoid an error
 	mkdir -pv /etc/unbound/zonefiles
+	chown -v nobody:nobody /etc/unbound/zonefiles
 	touch /etc/unbound/zonefiles/allow.rpz
 	touch /etc/unbound/zonefiles/block.rpz
 
