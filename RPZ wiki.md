@@ -1,6 +1,6 @@
 # RPZ - Response Policy Zones
 
-Response Policy Zones (RPZ) is a mechanism that makes it possible to define your local policies in a standardised way and load  policies from external sources.  [^1].  The base functionality of blocking DNS is similar to piHole but without the pretty graphics.  (there are no plans to add the pretty grphics).
+Response Policy Zones (RPZ) is a mechanism that makes it possible to define local policies in a standardised way and load  policies from external sources.  [^1].  The base functionality of blocking DNS is similar to piHole but without the pretty graphics.  (there are no plans to add the pretty grphics).
 
 Note: Domains blocked by RPZ are not DROPped or REJECTed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If your user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed you may be better off of using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
 
