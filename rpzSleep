@@ -40,16 +40,16 @@ sleepTime="${1:-5m}"			#	default to sleep for 5m (5 minutes)
 
 zoneList=$( /usr/sbin/unbound-control list_auth_zones | /usr/bin/awk '{print $1}' )
 
-for zone in ${zoneList} ; do 
+for zone in ${zoneList} ; do
 	/usr/bin/printf "disable ${zone}\t"
 	/usr/sbin/unbound-control rpz_disable "${zone}"
-done 
+done
 
 msg_log "info: rpz: disabled all zones for ${sleepTime}"
 
 /bin/sleep "${sleepTime}"
 
-for zone in ${zoneList} ; do 
+for zone in ${zoneList} ; do
 	/usr/bin/printf "enable ${zone}\t"
 	/usr/sbin/unbound-control rpz_enable "${zone}"
 done
