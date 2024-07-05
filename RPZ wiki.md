@@ -35,7 +35,7 @@ PS - I am looking for someone to assist with a WebGUI.
 
 ### Custom allow list or block list
 
-The `rpzAllowBlock` application loads custom allow lists and blocks lists into unbound RPZ.  Update the lists first and then run the `rpzAllowBlock` command. 
+The `rpzAllowBlock` script loads custom allow lists and blocks lists into unbound RPZ.  Update the lists first and then run the `rpzAllowBlock` command. 
 
 #### Allow list
 Sometimes outside RPZ lists will block a website that requires access.  Allowed items can be added to this list.
@@ -55,7 +55,7 @@ rpzAllowBlock
 
 
 ### Create a config file for RPZ
-The `rpzConfig` application assists in creating, removing or replacing an RPZ config file.
+The `rpzConfig` script assists in creating, removing or replacing an RPZ config file.
 
 ```
 Usage: 	rpzConfig  <action> <name> <url>
@@ -85,7 +85,7 @@ Example response:
 
 ### Metrics of RPZ usage
 
-The `rpzMetrics` application searches the message logs for RPZ names and sorts those names by the number of hits.  Selecting all message logs (1 year or 53 message log files) may take ~60 seconds to complete.
+The `rpzMetrics` script searches the message logs for RPZ names and sorts those names by the number of hits.  Selecting all message logs (1 year or 53 message log files) may take ~60 seconds to complete.
 
 ```
 Usage: 	rpzMetrics <number of message logs>
