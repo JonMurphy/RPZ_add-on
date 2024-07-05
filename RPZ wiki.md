@@ -107,6 +107,11 @@ Usage: 	rpzSleep <sleep time>
 Example response:
 <img width="977" alt="342118230-9f753be5-80d7-4da5-8e56-023829207185" src="https://github.com/JonMurphy/RPZ/assets/15616372/d86d41d2-ded9-4025-b359-1af113438a61">
 
+## Recommended RPZ lists
+ 1. https://github.com/hagezi/dns-blocklists
+ 2. https://threatfox.abuse.ch/export/#rpz
+ 3. https://urlhaus.abuse.ch/api/#rpz
+
 
 ## Links
  * https://en.wikipedia.org/wiki/Response_policy_zone
