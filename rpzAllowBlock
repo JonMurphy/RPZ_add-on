@@ -19,15 +19,14 @@
 #                                                                             #
 ###############################################################################
 
-#	v18 on 2024-07-04
+#	v19 on 2024-07-05
 
 ###############     Functions     ###############
 
 msg_log () {
+	/usr/bin/logger --tag "${tagName}" "$*"
 	if /usr/bin/tty --silent ; then
 		echo "${tagName}:" "$*"
-	else
-		/usr/bin/logger --tag "${tagName}" "$*"
 	fi
 }
 
@@ -51,7 +50,7 @@ if [[ -s "${allowList}" ]] ; then
 		/bin/sed "/^[^;$].*[[:alnum:]]/ s|$|	CNAME	rpz-passthru.|" )
 
 	#	make the zone file
-	msg_log "rpz: create zonefile for allow list"
+	msg_log "info: rpz: create zonefile for allow list"
 	/bin/cat <<-EOF > "${allowZoneFile}"
 	; Name:				Allow List
 	; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
@@ -77,7 +76,7 @@ if [[ -s "${blockList}" ]] ; then
 	actionList=$( /usr/bin/awk '{$1=$1};1' "${blockList}" |
 		/bin/sed "/^[^;].*[[:alnum:]]/ s|$|	CNAME	.|" )
 
-	msg_log "rpz: create zonefile for block list"
+	msg_log "info: rpz: create zonefile for block list"
 	/bin/cat <<-EOF > "${blockZoneFile}"
 	; Name:				Block List
 	; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
