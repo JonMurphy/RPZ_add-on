@@ -25,7 +25,7 @@ ls -l
 
 cp -v ROOTFILES /opt/pakfire/db/rootfiles/rpz
 
-./install.sh
+NAME=rpz ./install.sh
 
 #  Restart unbound to load the recently changed config file
 
