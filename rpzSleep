@@ -19,16 +19,15 @@
 #                                                                             #
 ###############################################################################
 
-#	v03 on 2024-07-04
+#	v04 on 2024-07-05
 
 ###############     Functions     ###############
 
 #	send message to message log
 msg_log () {
+	/usr/bin/logger --tag "${tagName}" "$*"
 	if /usr/bin/tty --silent ; then
 		echo "${tagName}:" "$*"
-	else
-		/usr/bin/logger --tag "${tagName}" "$*"
 	fi
 }
 
