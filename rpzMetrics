@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-#	v17 on 2024-07-04
+#	v18 on 2024-07-05
 
 ###############       Main        ###############
 
@@ -34,7 +34,7 @@ messageLogs=$( find /var/log/messages* -type f |
 #	get the list of RPZ names & counts from the message log(s)
 rpzNameCount=$( for logf in ${messageLogs} ; do
 	/usr/bin/zgrep --text --fixed-strings 'info: rpz: applied' "${logf}" |
-	/usr/bin/awk '$10 ~ /\[/ { print $10 }' ;
+	/usr/bin/awk '$10 ~ /\[\w*]/ { print $10 }' ;
 	done | /usr/bin/sort | /usr/bin/uniq --count )
 
 #	flip results and remove brackets `[` and `]`
