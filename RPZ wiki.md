@@ -23,8 +23,6 @@ pakfire install rpz
 ## Usage
 There is no web interface for this add-on. To run this add-on open the serial console, or the local terminal and access the IPFire box via SSH.  There are four simple scripts available for set-up:
 
-[rpzAllowBlock](RPZ%20wiki.md#custom-allow-list-or-block-list) - Loads custom allow lists and blocks lists into unbound RPZ
-
 [rpzConfig](RPZ%20wiki.md) - Create, remove or replace an external RPZ config file 
 
 [rpzMetrics](RPZ%20wiki.md) - Locates RPZ names from the message logs and sort by hits.  Selecting all logs (1 year) may take ~60 seconds to complete.
@@ -33,29 +31,10 @@ There is no web interface for this add-on. To run this add-on open the serial co
 
 PS - I am looking for someone to assist with a WebGUI.
 
-### Custom allow list or block list
-
-The `rpzAllowBlock` script loads custom allow lists and blocks lists into unbound RPZ.  Update the lists first and then run the `rpzAllowBlock` command. 
-
-#### Allow list
-Sometimes outside RPZ lists will block a website that requires access.  Allowed items can be added to this list.
-
-Edit the `/var/ipfire/rpz/allowlist` and add the needed websites:
-<img width="981" alt="Screen Shot 2024-07-04 at 4 08 32 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/6c21e799-a3d5-4a6f-8c66-4875e51d0b7e">
-
-#### Block list
-The block list operates in the same way and is located at `/var/ipfire/rpz/blocklist`:
-<img width="977" alt="Screen Shot 2024-07-04 at 4 23 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/0a35b5e7-fb0e-413b-aaa7-cd9a5da3f969">
-
-
-After saving the lists, launch this command from the terminal to load the `allowlist` file and the `blocklist` file into unbound:
-```
-rpzAllowBlock
-```
 
 
 ### Create a config file for RPZ
-The `rpzConfig` script assists in creating, removing or replacing an RPZ config file.
+The `rpzConfig` script assists in creating, removing or replacing an RPZ config file.  Also loads custom allow lists and blocks lists into unbound RPZ
 
 ```
 Usage: 	rpzConfig  <action> <name> <url>
@@ -74,12 +53,28 @@ Actions:
                        Other protocols such as file://, ftp://, etc. will not work.
 ```
 
+
 Example command:
 ```
 rpzConfig add MxUltimateHZ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/rpz/ultimate.txt
 ```
 Example response:
 <img width="1005" alt="Screen Shot 2024-07-04 at 4 51 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/a27f74b6-db45-4e91-a307-3ddb55cb82e2">
+
+#### Custom allow list or block list
+
+The `rpzAllowBlock` script loads custom allow lists and blocks lists into unbound RPZ.  Update the lists first and then run the `rpzAllowBlock` command. 
+
+#### Allow list
+Sometimes outside RPZ lists will block a website that requires access.  Allowed items can be added to this list.
+
+Edit the `/var/ipfire/rpz/allowlist` and add the needed websites:
+<img width="981" alt="Screen Shot 2024-07-04 at 4 08 32 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/6c21e799-a3d5-4a6f-8c66-4875e51d0b7e">
+
+#### Block list
+The block list operates in the same way and is located at `/var/ipfire/rpz/blocklist`:
+<img width="977" alt="Screen Shot 2024-07-04 at 4 23 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/0a35b5e7-fb0e-413b-aaa7-cd9a5da3f969">
+
 
 **Note**: whenever a RPZ config file is added, removed, or replaced, the upbound reload (i.e., `unbound-control reload`) is run.  This loads all of the new settings.  Keep in mind this may pause DNS up to ~60 seconds depending on the size of the RPZ files.  Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 1,000,000 lines of RPZ files (total for all RPZ files) is NOT recommended.
 
