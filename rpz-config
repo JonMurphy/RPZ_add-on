@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-#	v18 - 2024-07-05
+#	v19 - 2024-07-06
 
 ###############     Functions     ###############
 
@@ -30,30 +30,53 @@ msg_log () {
 	fi
 }
 
+check_name () {
+	local testName="${1}"
+	#	is this a valid name?  no `+`, maybe be other characers
+	regex='^[a-zA-Z0-9_]+$'
+	if [[ ! "${testName}" =~ $regex ]] || [[ "${testName}" == "allow" ]] || [[ "${theName}" == "block" ]] ; then
+		msg_log "error: rpz: the NAME is not valid: \"${testName}\". exit."
+		exit 1
+	fi
+}
 
+check_unbound_conf () {
+	#  check the above config files
+	msg_log "info: rpz: checking for errors with \"unbound-checkconf\""
+	/usr/sbin/unbound-checkconf
+	exit_code=$?
+	if [[ "${exit_code}" -ne 0 ]] ; then
+		msg_log "error: rpz: unbound-checkconf. exit."
+		exit "${exit_code}"
+	fi
+}
 ###############       Main        ###############
 
 tagName="unbound"
 
 #	to add or remove or replace a config file
-theAction="${1}"											#	input action
+theAction="${1}"										#	input action
 
-theName="${2}"												#	input RPZ name
-#	is this a valid name?  no `+`, maybe be other characers
-if ! echo "${theName}" | grep --quiet --extended-regexp '^[a-zA-Z0-9_]+$' ; then
-	msg_log "error: rpz: the NAME is not valid: \"${theName}\". exit."
-	exit 1
-fi
+theName="${2}"											#	input RPZ name
+#	checked below.  can be blank for Allow Block action
 
-theURL="${3}"												#	input RPZ URL
+theURL="${3}"											#	input RPZ URL
 #	checked below.  can be blank for remove action
 
-rpzConfig="/etc/unbound/local.d/${theName}.rpz.conf"		#	output zone conf file
-rpzFile="/etc/unbound/zonefiles/${theName}.rpz"				#	output for RPZ file
+rpzConfig="/etc/unbound/local.d/${theName}.rpz.conf"	#	output zone conf file
+rpzFile="/etc/unbound/zonefiles/${theName}.rpz"			#	output for RPZ file
 
+allowList="/var/ipfire/rpz/allowlist"					#	user list of allowed domains
+blockList="/var/ipfire/rpz/blocklist"					#	user list of blocked domains
+
+allowZoneFile="/etc/unbound/zonefiles/allow.rpz"		#	output file for RPZ allow
+blockZoneFile="/etc/unbound/zonefiles/block.rpz"		#	output file for RPZ block
 
 case "${theAction}" in
 	replace | '--replace')
+		#	is this a valid name?  no `+`, maybe be other characers
+		check_name "${theName}"
+
 		msg_log "info: rpz: replace existing config file \"${theName}.rpz.conf\""
 		#	trash config file and rpz file
 		/bin/rm --verbose "${rpzConfig}"
@@ -62,16 +85,18 @@ case "${theAction}" in
 		;&
 
 	add | '--add' )
+		#	is this a valid name?  no `+`, maybe be other characers
+		check_name "${theName}"
+
 		#	does this config already exist?  If yes, then exit
 		if [[ -f "${rpzConfig}" ]] ; then
 			msg_log "info: rpz: ${rpzConfig} already exists. exit"
-			exit 0
+			exit 1
 		fi
 
 		#	is this a valid URL?
 		regex='^https://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]'
-		if ! [[ "${theURL}" =~ $regex ]]
-		then
+		if ! [[ "${theURL}" =~ $regex ]] ; then
 			msg_log "error: rpz: the URL is not valid: \"${theURL}\". exit."
 			exit 1
 		fi
@@ -94,39 +119,92 @@ case "${theAction}" in
 		#	unbound requires these settings for rpz files
 		/bin/chown --verbose nobody:nobody "${rpzFile}"
 		/bin/chmod --verbose 644 "${rpzFile}"
-
-		#  check the above config files
-		msg_log "info: rpz: checking for errors with \"unbound-checkconf\""
-		/usr/sbin/unbound-checkconf
-		exit_code=$?
-		if [[ ${exit_code} -ne 0 ]] ; then
-			msg_log "error: rpz: unbound-checkconf for \"${theName}\". exit."
-			exit $exit_code
-		fi
 		;;
 
 	remove | '--remove' )
 		#	trash config file & rpz file
+
+		#	is this a valid name?  no `+`, maybe be other characers
+		check_name "${theName}"
+
 		msg_log "info: rpz: remove config file & rpz file \"${theName}\""
 		/bin/rm --verbose "${rpzConfig}"
 		/bin/rm --verbose "${rpzFile}"
+		
+		#  check unbound config files
+		check_unbound_conf
 		;;
+		
+	allowblock | allow | block )
+		##	build allow RPZ list
+		#	does an allowList exist?
+		if [[ -s "${allowList}" ]] ; then
+			#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
+			actionList=$( /usr/bin/awk '{$1=$1};1' "${allowList}" |
+				/bin/sed "/^[^;$].*[[:alnum:]]/ s|$|	CNAME	rpz-passthru.|" )
+		
+			#	make the zone file
+			msg_log "info: rpz: create zonefile for allowlist"
+			/bin/cat <<-EOF > "${allowZoneFile}"
+			; Name:				Allow List
+			; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
+			;
+			;	domains with actions list
+			;
+			${actionList}
+			EOF
+		
+			#	reload the zone that was just updated
+			zoneBase=$( basename "${allowZoneFile}" )
+			/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
+		
+			# 	/usr/bin/logger -t unbound "info: rpz: ${zoneBase} file is NEW"
+			msg_log "info: rpz: ${zoneBase} file is NEW"
+		fi
+			
+		##	build block RPZ list
+		#	does an blockList exist?
+		if [[ -s "${blockList}" ]] ; then
+			#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
+			actionList=$( /usr/bin/awk '{$1=$1};1' "${blockList}" |
+				/bin/sed "/^[^;].*[[:alnum:]]/ s|$|	CNAME	.|" )
+		
+			msg_log "info: rpz: create zonefile for blocklist"
+			/bin/cat <<-EOF > "${blockZoneFile}"
+			; Name:				Block List
+			; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
+			;
+			;	domains with actions list
+			;
+			${actionList}
+			EOF
+		
+			#	reload the zone that was just updated
+			zoneBase=$( basename "${blockZoneFile}" )
+			/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
+		
+			msg_log "info: rpz: ${zoneBase} file is NEW"
+		fi
+		
+		#  check unbound config files
+		check_unbound_conf
+		;;	
 
 	*)
 		msg_log "error: rpz: missing or incorrect parameter"
-		msg_log "error: rpz: Usage:  rpzConfig.sh <ACTION> <NAME> <URL>"
+		/usr/bin/printf "Usage:  rpzConfig.sh <ACTION> <NAME> <URL>\n"
 		exit 1
 		;;
 
 esac
 
-#	reload the zone that was just updated
+#	reload due to the changes
 msg_log  "rpz: running \"unbound-control reload\""
 /usr/sbin/unbound-control reload
 exit_code=$?
-if [[ ${exit_code} -ne 0 ]] ; then
+if [[ "${exit_code}" -ne 0 ]] ; then
 	msg_log "error: rpz: unbound-control \"${theName}\". exit."
-	exit $exit_code
+	exit "${exit_code}"
 fi
 
 exit
