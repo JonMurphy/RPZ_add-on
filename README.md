@@ -21,7 +21,7 @@ cp -v /tmp/*.ipfire /opt/pakfire/tmp
 
 tar xvf rpz-1.0.0-1.ipfire
 
-ls -l
+ls -l /opt/pakfire/tmp
 
 cp -v ROOTFILES /opt/pakfire/db/rootfiles/rpz
 
