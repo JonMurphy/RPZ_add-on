@@ -130,11 +130,11 @@ case "${theAction}" in
 		msg_log "info: rpz: remove config file & rpz file \"${theName}\""
 		/bin/rm --verbose "${rpzConfig}"
 		/bin/rm --verbose "${rpzFile}"
-		
+
 		#  check unbound config files
 		check_unbound_conf
 		;;
-		
+
 	allowblock | allow | block )
 		##	build allow RPZ list
 		#	does an allowList exist?
@@ -142,7 +142,7 @@ case "${theAction}" in
 			#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
 			actionList=$( /usr/bin/awk '{$1=$1};1' "${allowList}" |
 				/bin/sed "/^[^;$].*[[:alnum:]]/ s|$|	CNAME	rpz-passthru.|" )
-		
+
 			#	make the zone file
 			msg_log "info: rpz: create zonefile for allowlist"
 			/bin/cat <<-EOF > "${allowZoneFile}"
@@ -153,22 +153,22 @@ case "${theAction}" in
 			;
 			${actionList}
 			EOF
-		
+
 			#	reload the zone that was just updated
 			zoneBase=$( basename "${allowZoneFile}" )
 			/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
-		
+
 			# 	/usr/bin/logger -t unbound "info: rpz: ${zoneBase} file is NEW"
 			msg_log "info: rpz: ${zoneBase} file is NEW"
 		fi
-			
+
 		##	build block RPZ list
 		#	does an blockList exist?
 		if [[ -s "${blockList}" ]] ; then
 			#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
 			actionList=$( /usr/bin/awk '{$1=$1};1' "${blockList}" |
 				/bin/sed "/^[^;].*[[:alnum:]]/ s|$|	CNAME	.|" )
-		
+
 			msg_log "info: rpz: create zonefile for blocklist"
 			/bin/cat <<-EOF > "${blockZoneFile}"
 			; Name:				Block List
@@ -178,17 +178,17 @@ case "${theAction}" in
 			;
 			${actionList}
 			EOF
-		
+
 			#	reload the zone that was just updated
 			zoneBase=$( basename "${blockZoneFile}" )
 			/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
-		
+
 			msg_log "info: rpz: ${zoneBase} file is NEW"
 		fi
-		
+
 		#  check unbound config files
 		check_unbound_conf
-		;;	
+		;;
 
 	*)
 		msg_log "error: rpz: missing or incorrect parameter"
