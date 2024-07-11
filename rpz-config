@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-#	v19 - 2024-07-06
+#	v20 - 2024-07-11
 
 ###############     Functions     ###############
 
@@ -34,7 +34,7 @@ check_name () {
 	local testName="${1}"
 	#	is this a valid name?  no `+`, maybe be other characers
 	regex='^[a-zA-Z0-9_]+$'
-	if [[ ! "${testName}" =~ $regex ]] || [[ "${testName}" == "allow" ]] || [[ "${theName}" == "block" ]] ; then
+	if [[ ! "${testName}" =~ $regex ]] ; then
 		msg_log "error: rpz: the NAME is not valid: \"${testName}\". exit."
 		exit 1
 	fi
@@ -87,38 +87,94 @@ case "${theAction}" in
 	add | '--add' )
 		#	is this a valid name?  no `+`, maybe be other characers
 		check_name "${theName}"
+		regex='(allow|block|allowblock)'
+		if ! [[ "${theName}" =~ $regex ]] ; then
+			#	does this config already exist?  If yes, then exit
+			if [[ -f "${rpzConfig}" ]] ; then
+				msg_log "info: rpz: ${rpzConfig} already exists. exit"
+				exit 1
+			fi
+	
+			#	is this a valid URL?
+			regex='^https://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]'
+			if ! [[ "${theURL}" =~ $regex ]] ; then
+				msg_log "error: rpz: the URL is not valid: \"${theURL}\". exit."
+				exit 1
+			fi
+	
+			#	create the zone config file
+			msg_log "info: rpz: add config file \"${theName}.rpz.conf\""
+			cat <<-EOF > "${rpzConfig}"
+			rpz:
+				name:					${theName}.rpz
+				zonefile:				/etc/unbound/zonefiles/${theName}.rpz
+				url:  ${theURL}
+				rpz-action-override:	nxdomain
+				rpz-log:				yes
+				rpz-log-name:			${theName}
+				rpz-signal-nxdomain-ra:	yes
+			EOF
+	
+			#	set-up zone file
+			/usr/bin/touch "${rpzFile}"
+			#	unbound requires these settings for rpz files
+			/bin/chown --verbose nobody:nobody "${rpzFile}"
+			/bin/chmod --verbose 644 "${rpzFile}"	
+	
+		else
 
-		#	does this config already exist?  If yes, then exit
-		if [[ -f "${rpzConfig}" ]] ; then
-			msg_log "info: rpz: ${rpzConfig} already exists. exit"
-			exit 1
+			##	build allow RPZ list
+			#	does an allowList exist?
+			if [[ -s "${allowList}" ]] ; then
+				#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
+				actionList=$( /usr/bin/awk '{$1=$1};1' "${allowList}" |
+					/bin/sed "/^[^;$].*[[:alnum:]]/ s|$|	CNAME	rpz-passthru.|" )
+	
+				#	make the zone file
+				msg_log "info: rpz: create zonefile for allowlist"
+				/bin/cat <<-EOF > "${allowZoneFile}"
+				; Name:				Allow List
+				; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
+				;
+				;	domains with actions list
+				;
+				${actionList}
+				EOF
+	
+				#	reload the zone that was just updated
+				zoneBase=$( basename "${allowZoneFile}" )
+				/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
+	
+				# 	/usr/bin/logger -t unbound "info: rpz: ${zoneBase} file is NEW"
+				msg_log "info: rpz: ${zoneBase} file is NEW"
+			fi
+	
+			##	build block RPZ list
+			#	does an blockList exist?
+			if [[ -s "${blockList}" ]] ; then
+				#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
+				actionList=$( /usr/bin/awk '{$1=$1};1' "${blockList}" |
+					/bin/sed "/^[^;].*[[:alnum:]]/ s|$|	CNAME	.|" )
+	
+				msg_log "info: rpz: create zonefile for blocklist"
+				/bin/cat <<-EOF > "${blockZoneFile}"
+				; Name:				Block List
+				; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
+				;
+				;	domains with actions list
+				;
+				${actionList}
+				EOF
+	
+				#	reload the zone that was just updated
+				zoneBase=$( basename "${blockZoneFile}" )
+				/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
+	
+				msg_log "info: rpz: ${zoneBase} file is NEW"
+			fi
+			#  check unbound config files
+			check_unbound_conf
 		fi
-
-		#	is this a valid URL?
-		regex='^https://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]'
-		if ! [[ "${theURL}" =~ $regex ]] ; then
-			msg_log "error: rpz: the URL is not valid: \"${theURL}\". exit."
-			exit 1
-		fi
-
-		#	create the zone config file
-		msg_log "info: rpz: add config file \"${theName}.rpz.conf\""
-		cat <<-EOF > "${rpzConfig}"
-		rpz:
-		    name:					${theName}.rpz
-		    zonefile:				/etc/unbound/zonefiles/${theName}.rpz
-		    url:  ${theURL}
-		    rpz-action-override:	nxdomain
-		    rpz-log:				yes
-		    rpz-log-name:			${theName}
-		    rpz-signal-nxdomain-ra:	yes
-		EOF
-
-		#	set-up zone file
-		/usr/bin/touch "${rpzFile}"
-		#	unbound requires these settings for rpz files
-		/bin/chown --verbose nobody:nobody "${rpzFile}"
-		/bin/chmod --verbose 644 "${rpzFile}"
 		;;
 
 	remove | '--remove' )
@@ -130,61 +186,6 @@ case "${theAction}" in
 		msg_log "info: rpz: remove config file & rpz file \"${theName}\""
 		/bin/rm --verbose "${rpzConfig}"
 		/bin/rm --verbose "${rpzFile}"
-
-		#  check unbound config files
-		check_unbound_conf
-		;;
-
-	allowblock | allow | block )
-		##	build allow RPZ list
-		#	does an allowList exist?
-		if [[ -s "${allowList}" ]] ; then
-			#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
-			actionList=$( /usr/bin/awk '{$1=$1};1' "${allowList}" |
-				/bin/sed "/^[^;$].*[[:alnum:]]/ s|$|	CNAME	rpz-passthru.|" )
-
-			#	make the zone file
-			msg_log "info: rpz: create zonefile for allowlist"
-			/bin/cat <<-EOF > "${allowZoneFile}"
-			; Name:				Allow List
-			; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
-			;
-			;	domains with actions list
-			;
-			${actionList}
-			EOF
-
-			#	reload the zone that was just updated
-			zoneBase=$( basename "${allowZoneFile}" )
-			/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
-
-			# 	/usr/bin/logger -t unbound "info: rpz: ${zoneBase} file is NEW"
-			msg_log "info: rpz: ${zoneBase} file is NEW"
-		fi
-
-		##	build block RPZ list
-		#	does an blockList exist?
-		if [[ -s "${blockList}" ]] ; then
-			#	drop any extra "blanks" and add "CNAME <RPZ action>." to each line
-			actionList=$( /usr/bin/awk '{$1=$1};1' "${blockList}" |
-				/bin/sed "/^[^;].*[[:alnum:]]/ s|$|	CNAME	.|" )
-
-			msg_log "info: rpz: create zonefile for blocklist"
-			/bin/cat <<-EOF > "${blockZoneFile}"
-			; Name:				Block List
-			; Last modified:	$(date "+%Y-%m-%d at %H.%M.%S %Z")
-			;
-			;	domains with actions list
-			;
-			${actionList}
-			EOF
-
-			#	reload the zone that was just updated
-			zoneBase=$( basename "${blockZoneFile}" )
-			/usr/sbin/unbound-control auth_zone_reload "${zoneBase}"
-
-			msg_log "info: rpz: ${zoneBase} file is NEW"
-		fi
 
 		#  check unbound config files
 		check_unbound_conf
