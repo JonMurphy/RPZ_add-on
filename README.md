@@ -28,7 +28,7 @@ There is no web interface for this add-on. To run this add-on open the serial co
 
 [rpz-metrics](RPZ%20wiki.md) - Locates RPZ names from the message logs and sort by hits.
 
-[rpz-sleep](RPZ%20wiki.md) - Disable the RPZ for a NUMBER of seconds (default 5 minutes).
+[rpz-sleep](RPZ%20wiki.md) - Pause RPZ for a NUMBER of seconds (default 5 minutes).
 
 PS - I am looking for someone to assist with a WebGUI.
 
