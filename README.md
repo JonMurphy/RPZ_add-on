@@ -22,7 +22,10 @@ pakfire install rpz
 
 
 ## Usage
-There is no web interface for this add-on. To run this add-on open the serial console, or the local terminal and access the IPFire box via SSH.  There are three simple scripts available for set-up:
+There is no web interface for this add-on. 
+ * **PS** - I need someone to assist with a WebGUI
+
+To run this add-on open the serial console, or the local terminal and access the IPFire box via SSH.  There are three simple scripts available for set-up:
 
 [rpz-config](RPZ%20wiki.md) - Create, remove or make an external RPZ file 
 
@@ -30,7 +33,6 @@ There is no web interface for this add-on. To run this add-on open the serial co
 
 [rpz-sleep](RPZ%20wiki.md) - Pause RPZ for a NUMBER of seconds (default 5 minutes).
 
-PS - I am looking for someone to assist with a WebGUI.
 
 ### Create a config file for RPZ
 The `rpz-config` script assists in creating, deleting or builing RPZ files.
