@@ -26,7 +26,7 @@ There is no web interface for this add-on. To run this add-on open the serial co
 
 [rpz-config](RPZ%20wiki.md) - Create, remove or make an external RPZ file 
 
-[rpz-metrics](RPZ%20wiki.md) - Locates RPZ names from the message logs and sort by hits.  Selecting all logs (1 year) may take ~60 seconds to complete.
+[rpz-metrics](RPZ%20wiki.md) - Locates RPZ names from the message logs and sort by hits.
 
 [rpz-sleep](RPZ%20wiki.md) - Disable the RPZ for a NUMBER of seconds (default 5 minutes).
 
