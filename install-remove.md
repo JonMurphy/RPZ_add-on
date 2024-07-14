@@ -5,6 +5,11 @@
 iMac:~ jon$ scp -P 222 /Users/jcmurphy/Desktop/rpz-1.0.0-1.ipfire root@ipfire.localdomain:/tmp
 #  or
 iMac:~ jon$ scp -P 222 /Users/jcmurphy/Desktop/rpz-1.0.0-1.ipfire root@192.168.7.1:/tmp
+
+#
+ssh -p 222 root@ipfire.localdomain
+#  or
+ssh -p 222 root@192.168.7.1
 ```
 
 ### IPFire side
