@@ -16,7 +16,7 @@ ssh -p 222 root@192.168.7.1
 ```
 ls -l /tmp
 
-cd /opt/pakfire/tmp/
+cd /opt/pakfire/tmp/ && ls -l /opt/pakfire/tmp
 
 cp -v /tmp/*.ipfire /opt/pakfire/tmp
 
