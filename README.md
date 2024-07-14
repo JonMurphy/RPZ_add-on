@@ -25,7 +25,7 @@ pakfire install rpz
 There is no web interface for this add-on. 
  * **PS** - I need someone to assist with a WebGUI
 
-To run this add-on open the serial console, or the local terminal and access the IPFire box via SSH.  There are three simple scripts available for set-up:
+To run this add-on, open the serial console, or open the local terminal to access the IPFire box via SSH.  There are three simple scripts available for set-up:
 
 [rpz-config](RPZ%20wiki.md) - Create, remove or make an external RPZ file 
 
@@ -34,7 +34,7 @@ To run this add-on open the serial console, or the local terminal and access the
 [rpz-sleep](RPZ%20wiki.md) - Pause RPZ for a NUMBER of seconds (default 5 minutes).
 
 
-### Create a config file for RPZ
+## Create a config file for RPZ
 The `rpz-config` script assists in creating, deleting or builing RPZ files.
 
 ```
@@ -52,16 +52,16 @@ make <allow or block>   build the custom allow or block RPZ files
 
 Example commands:
 ```
-rpz-config add MxUltimateHZ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/rpz/ultimate.txt
+rpz-config add MxLightHZ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/rpz/light.txt
 
-rpz-config remove MxUltimateHZ
+rpz-config remove MxLightHZ
 
 rpz-config make allow
 ```
 Example response:
-<img width="1005" alt="Screen Shot 2024-07-04 at 4 51 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/a27f74b6-db45-4e91-a307-3ddb55cb82e2">
+<img width="977" alt="Screen Shot 2024-07-14 at 2 03 51 PM" src="https://github.com/user-attachments/assets/56c07e82-fbdf-41fb-b3d1-4ada298528c9">
 
-#### Custom allow list or block list
+### Custom allow list or block list
 The `rpz-config make allow` script loads the custom allow list into unbound RPZ.
 
 #### Allow list
@@ -74,9 +74,8 @@ Edit the `/var/ipfire/rpz/allowlist` and add the needed websites:
 The block list operates in a similar way as the allow list and is located at `/var/ipfire/rpz/blocklist`:
 <img width="977" alt="Screen Shot 2024-07-04 at 4 23 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/0a35b5e7-fb0e-413b-aaa7-cd9a5da3f969">
 
-**Note**: whenever a RPZ file is added, removed, or built the upbound reload (i.e., `unbound-control reload`) is run.  This loads all of the new settings.  Keep in mind this may pause DNS up to ~60 seconds depending on the size of the RPZ files.  Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 1,000,000 lines of RPZ files (total lines for all RPZ files) is NOT recommended.
 
-### Metrics of RPZ usage
+## Metrics of RPZ usage
 The `rpz-metrics` script searches the message logs for RPZ names and sorts those names by the number of hits.  Selecting all message logs (1 year or 53 message log files) may take ~60 seconds to complete.
 
 ```
@@ -85,7 +84,7 @@ Usage: 	rpz-metrics <number of message logs>
 ```
 
 Example response:
-<img width="977" alt="Screen Shot 2024-07-04 at 9 49 32 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/63b2adf5-cbaf-4c4f-9011-301e60898e82">
+<img width="977" alt="Screen Shot 2024-07-14 at 1 51 28 PM" src="https://github.com/user-attachments/assets/ffde7e0f-1da5-4b3d-a2b3-b77c24c0231c">
 
 ### Pause RPZ for N time
 Pause for NUMBER seconds. SUFFIX may be 's' for seconds, 'm' for minutes, 'h' for hours or 'd' for days.
@@ -95,7 +94,7 @@ Usage: 	rpz-sleep <sleep time>
 ```
 
 Example response:
-<img width="977" alt="342118230-9f753be5-80d7-4da5-8e56-023829207185" src="https://github.com/JonMurphy/RPZ/assets/15616372/d86d41d2-ded9-4025-b359-1af113438a61">
+<img width="977" alt="Screen Shot 2024-07-14 at 2 25 17 PM" src="https://github.com/user-attachments/assets/7099e440-095f-4eb7-8962-b9943fc238af">
 
 
 ## Recommended RPZ lists
@@ -111,6 +110,6 @@ Example response:
 
 [^1]: https://unbound.docs.nlnetlabs.nl/en/latest/topics/filtering/rpz.html
 
-#### Known issues
+## Known issues
  * The current unbound bridge causes frequent unbound restarts and may cause the RPZ list updates to be delayed by a day or three.
  * Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 500,000 lines of RPZ files (total lines for all RPZ files) is discouraged. Over 1,000,000 lines of RPZ files (total lines for all RPZ files) is NOT recommended.
