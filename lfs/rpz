@@ -61,12 +61,10 @@ dist:
 $(TARGET) :
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP)
-	
+
 	#	install RPZ scripts
 	install -v -m 755 \
-		$(DIR_CONF)/rpz/{rpzAllowBlock,rpzConfig} \
-		$(DIR_CONF)/rpz/{rpzMetrics,rpzSleep} \
-		-t /usr/sbin
+	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep} -t /usr/sbin
 
 	# Install settings folder and two empty files
 	mkdir -pv /var/ipfire/rpz
@@ -76,8 +74,8 @@ $(TARGET) :
 	# Add conf file to /etc directory
 	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
 
-	#	create zonefiles directory for the RPZ files and add two empty RPZ 
-	#	  files to avoid an error
+	#	create zonefiles directory for the RPZ files and add two empty RPZ
+	#	  files to avoid a unbound config error
 	mkdir -pv /etc/unbound/zonefiles
 	chown -v nobody:nobody /etc/unbound/zonefiles
 	touch /etc/unbound/zonefiles/allow.rpz
