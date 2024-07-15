@@ -17,17 +17,17 @@ https://unbound.docs.nlnetlabs.nl/en/latest/topics/filtering/rpz.html
 
 
 ## Why is it needed?
-Some IPFire admin's utilize pi-hole to block unwanted websites via DNS lookup.  
+Some IPFire admin's utilize pihole to block unwanted websites via DNS lookup.  Moving the base functionality (without pretty graphs) of pihole to IPFire removes one device from the admin's local network.  Hopefully that removes the questions from the Community for an unsupported device.
+
+
+
+And some admins utilize URL filter to block websites.
 
 The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics.  (there are no plans to add the pretty grphics).
 
 
-
-
-I beleive enabling the URL filter has a similar effect of blocking unwanted websites.  
-
-
 ## What are the use cases?
-
+ * easy replacement for pihole base functions
+ * easy replacement for URL Filter
 
 
