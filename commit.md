@@ -27,7 +27,7 @@ The base functionality of RPZ blocking DNS is similar to piHole but without the 
 
 
 ## What are the use cases?
- * easy replacement for pihole base functions
- * easy replacement for URL Filter
+ * simple replacement for pihole base functions
+ * simple replacement for URL Filter if admin runs IPFire proxy in transparent mode
 
 
