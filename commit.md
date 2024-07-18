@@ -13,13 +13,13 @@ This RPZ add-on enables the RPZ functionality by adding a couple lines in a conf
 RPZ was release in 2010 and has been part of the IPFire build since ~2015.
 
 ### Why is it needed?
-Some IPFire admin's utilize pihole to block unwanted websites via DNS lookup.  Moving the base functionality (without pretty graphs) of pihole to IPFire removes one device from the admin's local network. (and hopefully this reduces the pihole questions from the Community for an unsupported device.)
+Some IPFire admin's utilize pihole to block unwanted websites via DNS lookup.  Moving the pihole base functionality (without pretty graphs) to IPFire removes one device from the admin's local network. And hopefully this reduces the pihole questions from the Community.
 
-The list RPZ providers can be recommended by IPFire and coded into a set list.  Or, if prefered, the local admin can choose their own RPZ providers.
+A list of RPZ providers can be recommended by IPFire and coded into a set list.  Or, if prefered, the local admin can choose their own RPZ providers.
 
 ### What are the use cases?
  * simple replacement for pihole base functionality
- * when admin sets the IPFire proxy to transparent mode, RPZ is a simple replacement for the URL Filter 
+ * RPZ can be a nice replacement for the URL Filter 
 
 ### IPFire Wiki
 In process at: https://www.ipfire.org/docs/addons/rpz
@@ -31,4 +31,3 @@ In process at: https://www.ipfire.org/docs/addons/rpz
 ### Need help with...
 1) The custom allow and block lists are currently located at `/var/ipfire/rpz`.  Is this correct?
 2) The three bash scripts are currently located at `/usr/sbin`.  Is this correct?
-
