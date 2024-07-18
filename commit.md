@@ -3,7 +3,7 @@
 RPZ: install new add-on
 
 ### What is it?
-Response Policy Zone (RPZ) is a mechanism to define local policies in a standardised way and load those policies from external sources.  Bottom line: RPZ allows admins to easily block access to a website via DNS lookup.
+Response Policy Zone (RPZ) is a mechanism to define local policies in a standardised way and load those policies from external sources.  Bottom line: RPZ allows admins to easily block access to websites via DNS lookup.
 
 RPZ can block websites via categories.  Examples include: fake websites, annoying pop-up ads, newly registered domains, DoH bypass sites, bad "host" services, maliscious top level domains (e.g., *.zip, *.mov), piracy, gambling, pornography, and more.  RPZ lists come from various RPZ providers and their available 
 catagories.
