@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-#	v22 - 2024-07-12
+#	v23 - 2024-07-27
 
 ###############     Functions     ###############
 
@@ -58,7 +58,7 @@ make_rpz_file () {
 	theZoneFile="/etc/unbound/zonefiles/${theType}.rpz"		#	output file for RPZ
 
 	theAction='.'
-	if [[ "${theType}" =~ "block" ]] ; then
+	if [[ "${theType}" =~ "allow" ]] ; then
 		theAction='rpz-passthru.'
 	fi
 
