@@ -54,7 +54,7 @@ check_unbound_conf () {
 make_rpz_file () {
 	local theType="${1}"	#	allow or block
 
-	theList="/var/ipfire/dns/rpz/${theType}list"				#	input user list of domains
+	theList="/var/ipfire/dns/rpz/${theType}list"			#	input custom list of domains
 	theZoneFile="/etc/unbound/zonefiles/${theType}.rpz"		#	output file for RPZ
 
 	theAction='.'
