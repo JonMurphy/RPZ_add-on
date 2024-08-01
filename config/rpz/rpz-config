@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-#	v23 - 2024-07-27
+#	v23 - 2024-07-30
 
 ###############     Functions     ###############
 
@@ -54,7 +54,7 @@ check_unbound_conf () {
 make_rpz_file () {
 	local theType="${1}"	#	allow or block
 
-	theList="/var/ipfire/rpz/${theType}list"				#	input user list of domains
+	theList="/var/ipfire/dns/rpz/${theType}list"				#	input user list of domains
 	theZoneFile="/etc/unbound/zonefiles/${theType}.rpz"		#	output file for RPZ
 
 	theAction='.'
@@ -131,8 +131,8 @@ case "${theAction}" in
 		#	set-up zone file
 		/usr/bin/touch "${rpzFile}"
 		#	unbound requires these settings for rpz files
-		/bin/chown --verbose nobody:nobody "${rpzFile}"
-		/bin/chmod --verbose 644 "${rpzFile}"
+		/bin/chown nobody:nobody "${rpzFile}"
+		/bin/chmod 644 "${rpzFile}"
 		;;
 
 	#	trash config file & rpz file
@@ -143,8 +143,8 @@ case "${theAction}" in
 		fi
 
 		msg_log "info: rpz: remove config file & rpz file \"${theName}\""
-		/bin/rm --verbose "${rpzConfig}"
-		/bin/rm --verbose "${rpzFile}"
+		/bin/rm "${rpzConfig}"
+		/bin/rm "${rpzFile}"
 
 		check_unbound_conf
 		;;
