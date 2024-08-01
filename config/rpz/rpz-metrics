@@ -107,8 +107,9 @@ do
 		theLines=$( /bin/echo "${output}" | /usr/bin/awk '{ print $1 }' )
 		totalLines=$(( totalLines + theLines ))
 
-		#hitsPerLine=$( echo "scale=0 ; $theHits / $theLines" | bc )
-		hitsPerLine=$(( 100 * theHits / theLines ))
+		if [[ "${theLines}" -gt 2 ]] ; then
+			hitsPerLine=$(( 100 * theHits / theLines ))
+		fi
 	fi
 
 	#	get modification date
