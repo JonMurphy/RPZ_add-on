@@ -67,9 +67,9 @@ $(TARGET) :
 	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep} -t /usr/sbin
 
 	# Install settings folder and two empty files
-	mkdir -pv /var/ipfire/rpz
-	touch /var/ipfire/rpz/allowlist
-	touch /var/ipfire/rpz/blocklist
+	mkdir -pv /var/ipfire/dns/rpz
+	touch /var/ipfire/dns/rpz/allowlist
+	touch /var/ipfire/dns/rpz/blocklist
 
 	# Add conf file to /etc directory
 	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
