@@ -70,6 +70,7 @@ $(TARGET) :
 	mkdir -pv /var/ipfire/dns/rpz
 	touch /var/ipfire/dns/rpz/allowlist
 	touch /var/ipfire/dns/rpz/blocklist
+	chown -vR nobody:nobody /var/ipfire/dns/rpz
 
 	# Add conf file to /etc directory
 	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
