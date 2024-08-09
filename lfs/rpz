@@ -62,25 +62,25 @@ $(TARGET) :
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP)
 
-	#	install RPZ scripts
+	# install RPZ scripts
 	install -v -m 755 \
 	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep} -t /usr/sbin
+
+	# Add conf file to /etc directory
+	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
 
 	# Install settings folder and two empty files
 	mkdir -pv /var/ipfire/dns/rpz
 	touch /var/ipfire/dns/rpz/allowlist
 	touch /var/ipfire/dns/rpz/blocklist
-	chown -vR nobody:nobody /var/ipfire/dns/rpz
 
-	# Add conf file to /etc directory
-	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
-
-	#	create zonefiles directory for the RPZ files and add two empty RPZ
-	#	  files to avoid a unbound config error
+	# create zonefiles directory for the RPZ files and add two empty RPZ
+	#  files to avoid a unbound config error
 	mkdir -pv /etc/unbound/zonefiles
-	chown -v nobody:nobody /etc/unbound/zonefiles
 	touch /etc/unbound/zonefiles/allow.rpz
 	touch /etc/unbound/zonefiles/block.rpz
+
+	chown -vR nobody:nobody /var/ipfire/dns/rpz /etc/unbound/zonefiles
 
 	# Install backup definition
 	cp -vf $(DIR_CONF)/backup/includes/rpz /var/ipfire/backup/addons/includes/rpz
