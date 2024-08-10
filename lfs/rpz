@@ -80,6 +80,7 @@ $(TARGET) :
 	touch /etc/unbound/zonefiles/allow.rpz
 	touch /etc/unbound/zonefiles/block.rpz
 
+	#  set owner for unbound related files
 	chown -vR nobody:nobody /var/ipfire/dns/rpz /etc/unbound/zonefiles
 
 	# Install backup definition
