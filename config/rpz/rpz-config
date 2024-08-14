@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-#	v26 - 2024-08-10
+version="2024-08-12"
 
 ###############     Functions     ###############
 
@@ -127,11 +127,12 @@ case "${theAction}" in
 			rpz-signal-nxdomain-ra:	yes
 		EOF
 
-		#  set-up zone file
+		#  set-up zonefile
+		#    create an empty rpz file
 		/usr/bin/touch "${rpzFile}"
 		#  unbound requires these settings for rpz files
-		/bin/chown nobody:nobody "${rpzFile}"
-		/bin/chmod 644 "${rpzFile}"
+		/bin/chown nobody:nobody "${rpzFile}" "${rpzConfig}"
+		/bin/chmod 644 "${rpzFile}" "${rpzConfig}"
 		;;
 
 	#  trash config file & rpz file
