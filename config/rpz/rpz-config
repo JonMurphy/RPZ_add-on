@@ -176,7 +176,8 @@ case "${theAction}" in
 
 	*)
 		msg_log "error: rpz: missing or incorrect parameter"
-		/usr/bin/printf "Usage:  rpzConfig.sh <ACTION> <NAME> <URL>\n"
+		/usr/bin/printf "Usage:  rpzConfig <ACTION> <NAME> <URL>\n"
+		/usr/bin/printf "Version:  ${version}\n"
 		exit 1
 		;;
 
