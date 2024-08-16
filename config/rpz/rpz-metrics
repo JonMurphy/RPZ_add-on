@@ -19,62 +19,61 @@
 #                                                                             #
 ###############################################################################
 
-#	v19 on 2024-07-30
+version="2024-08-16"	# v20
 
 ###############       Main        ###############
 
-weeks="${1:-2}"			#	default to two message logs
-sortBy="${2:-name}"  	#	by name or by hits
+weeks="${1:-2}"         #   default to two message logs
+sortBy="${2:-name}"     #   by name or by hits
 
-#	get the list of message logs for N weeks
-messageLogs=$( find /var/log/messages* -type f |
-	/usr/bin/sort --version-sort |
-	head -"${weeks}" )
+#   get the list of message logs for N weeks
+messageLogs=$( find /var/log/messages* -type f | sort --version-sort |
+    head -"${weeks}" )
 
-#	get the list of RPZ names & counts from the message log(s)
+#   get the list of RPZ names & counts from the message log(s)
 rpzNameCount=$( for logf in ${messageLogs} ; do
-	/usr/bin/zgrep --text --extended-regexp 'info: rpz: applied.* A IN$' "${logf}" |
-	/usr/bin/awk '$10 ~ /\[\w*]/ { print $10 }' ;
-	done | /usr/bin/sort | /usr/bin/uniq --count )
+    zgrep --text --extended-regexp 'info: rpz: applied.* A IN$' "${logf}" |
+      awk '$10 ~ /\[\w*]/ { print $10 }' ;
+    done | sort | uniq --count )
 
-#	flip results and remove brackets `[` and `]`
-rpzNameCount=$( /bin/echo "${rpzNameCount}" |
-	/usr/bin/awk '{ print $2, $1 }' |
-	/bin/sed --regexp-extended 's|^\[(.*)\]|\1|' )
+#   flip results and remove brackets `[` and `]`
+rpzNameCount=$( echo "${rpzNameCount}" |
+    awk '{ print $2, $1 }' |
+      sed --regexp-extended 's|^\[(.*)\]|\1|' )
 
-#	grab only names
-rpzNames=$( /bin/echo "${rpzNameCount}" | /usr/bin/awk '{ print $1 }' )
+#   grab only names
+rpzNames=$( echo "${rpzNameCount}" | awk '{ print $1 }' )
 
-#	get list of RPZ files
-rpzFileList=$( /bin/find /etc/unbound/zonefiles -type f -iname "*.rpz" )
+#   get list of RPZ files
+rpzFileList=$( find /etc/unbound/zonefiles -type f -iname "*.rpz" )
 
-#	get basename of those files
-rpzBaseNames=$( /bin/echo "${rpzFileList}" |
-	/bin/sed 's|/etc/unbound/zonefiles/||g ; s|\.rpz||g ;' )
+#   get basename of those files
+rpzBaseNames=$( echo "${rpzFileList}" |
+    sed 's|/etc/unbound/zonefiles/||g ; s|\.rpz||g ;' )
 
-#	add to rpzNames
+#   add to rpzNames
 rpzNames="${rpzNames}"$'\n'"${rpzBaseNames}"
 
-#	drop duplicate names
-rpzNames=$( echo "${rpzNames}" | /usr/bin/sort --unique  )
+#   drop duplicate names
+rpzNames=$( echo "${rpzNames}" | sort --unique  )
 
-#	get line count for each RPZ
-lineCount=$( /bin/echo "${rpzFileList}" | /usr/bin/xargs wc -l )
+#   get line count for each RPZ
+lineCount=$( echo "${rpzFileList}" | xargs wc -l )
 
-#	get comment line count and blank line count for each RPZ
-commentCount=$( /bin/echo "${rpzFileList}" |
-	/usr/bin/xargs /bin/grep --count -e "^$" -e "^;" )
+#   get comment line count and blank line count for each RPZ
+commentCount=$( echo "${rpzFileList}" |
+    xargs grep --count -e "^$" -e "^;" )
 
-#	get modified date each RPZ
-modDateList=$( /bin/echo "${rpzFileList}" | xargs stat -c '%.10y  %n' )
+#   get modified date each RPZ
+modDateList=$( echo "${rpzFileList}" | xargs stat -c '%.10y  %n' )
 
-ucListAuthZones=$( /usr/sbin/unbound-control list_auth_zones )
+ucListAuthZones=$( unbound-control list_auth_zones )
 
-#	get width of RPZ names
-pWidth=$( /bin/echo "${rpzNames}" | /usr/bin/awk '{ print $1"   " }' | wc -L )
+#   get width of RPZ names
+pWidth=$( echo "${rpzNames}" | awk '{ print $1"   " }' | wc -L )
 pFormat="%-${pWidth}s %-8s %-8s %-8s %10s %12s\n"
 
-#	print title line
+#   print title line
 printf "${pFormat}" "name" "hits" "active" "lines" "hits/line%" "last update"
 printf -- "--------------"
 
@@ -83,60 +82,60 @@ totalLines=0
 totalHits=0
 while read -r theName
 do
-	printf -- "-"									#	pretend progress bar
-	#	get hit count
-	theHits="0"
-	if output=$( /bin/grep "^${theName}\s" <<< "${rpzNameCount}" ) ; then
-		theHits=$( /bin/echo "${output}" |
-		/usr/bin/awk '{ print $2 }' )
-		totalHits=$(( totalHits + theHits ))
-	fi
+    printf -- "-"        #   pretend progress bar
+    #   get hit count
+    theHits="0"
+    if output=$( grep "^${theName}\s" <<< "${rpzNameCount}" ) ; then
+        theHits=$( echo "${output}" |
+        awk '{ print $2 }' )
+        totalHits=$(( totalHits + theHits ))
+    fi
 
-	#	is this RPZ list active?
-	theActive="disabled"
-	if /bin/grep --quiet "^${theName}\.rpz" <<< "${ucListAuthZones}"
-	then
-		theActive="enabled"
-	fi
+    #   is this RPZ list active?
+    theActive="disabled"
+    if grep --quiet "^${theName}\.rpz" <<< "${ucListAuthZones}"
+    then
+        theActive="enabled"
+    fi
 
-	#	get line count then subtract comment count and blank line count
-	#	  from total line count
-	theLines="n/a"
-	hitsPerLine="0"
-	if output=$( /bin/grep --fixed-strings "/${theName}.rpz" <<< "${lineCount}" ) ; then
-		theLines=$( /bin/echo "${output}" | /usr/bin/awk '{ print $1 }' )
-		totalLines=$(( totalLines + theLines ))
+    #   get line count
+    theLines="n/a"
+    hitsPerLine="0"
+    if output=$( grep --fixed-strings "/${theName}.rpz" <<< "${lineCount}" ) ; then
+        theLines=$( echo "${output}" | awk '{ print $1 }' )
+        totalLines=$(( totalLines + theLines ))
 
-		if [[ "${theLines}" -gt 2 ]] ; then
-			hitsPerLine=$(( 100 * theHits / theLines ))
-		fi
-	fi
+        if [[ "${theLines}" -gt 2 ]] ; then
+            hitsPerLine=$(( 100 * theHits / theLines ))
+        fi
+    fi
 
-	#	get modification date
-	theModDate="n/a"
-	if output=$( /bin/grep --fixed-strings "/${theName}.rpz" <<< "${modDateList}" ) ; then
-		theModDate=$( /bin/echo "${output}" | /usr/bin/awk '{ print $1 }' )
-	fi
+    #   get modification date
+    theModDate="n/a"
+    if output=$( grep --fixed-strings "/${theName}.rpz" <<< "${modDateList}" ) ; then
+        theModDate=$( echo "${output}" | awk '{ print $1 }' )
+    fi
 
-	#	add to results list
-	theResults+="${theName} ${theHits} ${theActive} ${theLines} ${hitsPerLine} ${theModDate}"$'\n'
+    #   add to results list
+    theResults+="${theName} ${theHits} ${theActive} ${theLines} ${hitsPerLine} ${theModDate}"$'\n'
+    
 done <<< "${rpzNames}"
 
 case "${sortBy}" in
-	names|name)	sortArg=(-k3,3r -k1,1)			;;	#	sort by "active" then by "name"
+    names|name) sortArg=(-k3,3r -k1,1)          ;;  #   sort by "active" then by "name"
 
-	hits|hit)	sortArg=(-k3,3r -k2,2nr -k1,1)	;;	#	sort by "active" then by "hits" then by "name"
+    hits|hit)   sortArg=(-k3,3r -k2,2nr -k1,1)  ;;  #   sort by "active" then by "hits" then by "name"
 
-	lines|line)	sortArg=(-k3,3r -k4,4nr -k1,1)	;;	#	sort by "active" then by "lines" then by "name"
+    lines|line) sortArg=(-k3,3r -k4,4nr -k1,1)  ;;  #   sort by "active" then by "lines" then by "name"
 esac
 
 printf -- "--------------\n"
-#	remove blank lines, sort, print as columns
-/bin/echo "${theResults}" |
-	/usr/bin/awk '!/^[[:space:]]*$/' |
-	/usr/bin/sort "${sortArg[@]}"    |
-	/usr/bin/awk --assign=width="${pWidth}" \
-		'{ printf "%-*s %-8s %-8s %-8s %10s %12s\n", width, $1, $2, $3, $4, $5, $6 }'
+#   remove blank lines, sort, print as columns
+echo "${theResults}" |
+    awk '!/^[[:space:]]*$/' |
+    sort "${sortArg[@]}"    |
+    awk --assign=width="${pWidth}" \
+        '{ printf "%-*s %-8s %-8s %-8s %10s %12s\n", width, $1, $2, $3, $4, $5, $6 }'
 
 printf "${pFormat}" "" "=======" "" "========" "" ""
 printf "${pFormat}" "Totals -->" "${totalHits}" "" "${totalLines}" "" ""
