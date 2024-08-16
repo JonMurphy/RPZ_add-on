@@ -19,38 +19,38 @@
 #                                                                             #
 ###############################################################################
 
-#	v04 on 2024-07-05
+version="2024-08-16"        # v05
 
 ###############     Functions     ###############
 
-#	send message to message log
+#   send message to message log
 msg_log () {
-	/usr/bin/logger --tag "${tagName}" "$*"
-	if /usr/bin/tty --silent ; then
-		echo "${tagName}:" "$*"
-	fi
+    logger --tag "${tagName}" "$*"
+    if tty --silent ; then
+        echo "${tagName}:" "$*"
+    fi
 }
 
 ###############       Main        ###############
 
 tagName="unbound"
 
-sleepTime="${1:-5m}"			#	default to sleep for 5m (5 minutes)
+sleepTime="${1:-5m}"            #  default to sleep for 5m (5 minutes)
 
-zoneList=$( /usr/sbin/unbound-control list_auth_zones | /usr/bin/awk '{print $1}' )
+zoneList=$( unbound-control list_auth_zones | awk '{print $1}' )
 
 for zone in ${zoneList} ; do
-	/usr/bin/printf "disable ${zone}\t"
-	/usr/sbin/unbound-control rpz_disable "${zone}"
+    printf "disable ${zone}\t"
+    unbound-control rpz_disable "${zone}"
 done
 
 msg_log "info: rpz: disabled all zones for ${sleepTime}"
 
-/bin/sleep "${sleepTime}"
+sleep "${sleepTime}"
 
 for zone in ${zoneList} ; do
-	/usr/bin/printf "enable ${zone}\t"
-	/usr/sbin/unbound-control rpz_enable "${zone}"
+    printf "enable ${zone}\t"
+    unbound-control rpz_enable "${zone}"
 done
 
 msg_log "info: rpz: enabled all zones"
