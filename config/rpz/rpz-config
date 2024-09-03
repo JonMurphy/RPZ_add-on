@@ -19,91 +19,41 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-08-16"	# v27
+version="2024-09-01 - v38"
 
 ###############     Functions     ###############
 
-msg_log () {
-    logger --tag "${tagName}" "$*"
-    if tty --silent ; then
-        echo "${tagName}:" "$*"
-    fi
-}
-
-check_name () {
-    local testName="${1}"
-    #  check for a valid name
-    regex='^[a-zA-Z0-9_]+$'
-    if [[ ! "${testName}" =~ $regex ]] ; then
-        msg_log "error: rpz: the NAME is not valid: \"${testName}\". exit."
-        exit 101
-    fi
-}
-
-check_unbound_conf () {
-    #  check the above config files
-    msg_log "info: rpz: check for errors with \"unbound-checkconf\""
-    unbound-checkconf
-    exit_code=$?
-    if [[ "${exit_code}" -ne 0 ]] ; then
-        msg_log "error: rpz: unbound-checkconf found invalid configuration."
-        msg_log "error: rpz: In the Terminal run the command \
-          \"unbound-checkconf\" for more information. exit."
-        exit 102
-    fi
-}
-
-make_rpz_file () {
-    local theType="${1}"    #   allow or block
-
-    theList="/var/ipfire/dns/rpz/${theType}list"         #  input custom list of domains
-    theZoneFile="/etc/unbound/zonefiles/${theType}.rpz"  #  output file for RPZ
-
-    #  does a list exist?
-    if ! [[ -s "${theList}" ]] ; then
-        msg_log "error: rpz: the ${theList} is empty. exit."
-        exit 103
-    fi
-
-    theAction='.'
-    if [[ "${theType}" =~ "allow" ]] ; then
-        theAction='rpz-passthru.'
-    fi
-
-    #  drop any extra "blanks" and add "CNAME <RPZ action>." to each line
-    actionList=$( awk '{$1=$1};1' "${theList}" |
-        sed "/^[^;].*[[:alnum:]]/ s|$|  CNAME   ${theAction}|" )
-
-    msg_log "info: rpz: create zonefile for ${theList}"
-
-echo "
-; Name:             ${theType} list
-; Last modified:    $(date "+%Y-%m-%d at %H.%M.%S %Z")
-;
-;   domains with actions list
-;
-${actionList}
-" > "${theZoneFile}"
-
-}
+#source /usr/sbin/rpz-functions
+source /root/rpz/rpz-functions_v01.sh
 
 ###############       Main        ###############
 
 tagName="unbound"
 
-theAction="${1}"                    #  input action
-theName="${2}"                      #  input RPZ name
-theURL="${3}"                       #  input RPZ URL
+rpzAction="${1}"                    #  input RPZ action
+rpzName="${2}"                      #  input RPZ name
+rpzURL="${3}"                       #  input RPZ URL
+rpzOption1="${4}"                   #  input RPZ option #1
+rpzOption2="${5}"                   #  input RPZ option #2
 
-check_name "${theName}"             #  is this a valid name?
+rpzConfig="/etc/unbound/local.d/${rpzName}.rpz.conf"    #  output zone conf file
+rpzFile="/etc/unbound/zonefiles/${rpzName}.rpz"         #  output for RPZ file
 
-rpzConfig="/etc/unbound/local.d/${theName}.rpz.conf"    #  output zone conf file
-rpzFile="/etc/unbound/zonefiles/${theName}.rpz"         #  output for RPZ file
+rpzLog="yes"                        #  log default is yes
+ucReload="yes"						#  reload default is yes
 
-case "${theAction}" in
+while [[ $# -gt 0 ]] ; do
+    case "$1" in
+        --no-log )		rpzLog="no"   ;;
+        --no-reload )	ucReload="no" ; checkConf="no" ;;
+    esac
+    shift		# Shift after checking all the cases to get next option
+done
 
+case "${rpzAction}" in
     #  add new rpz list
     add )
+        check_name "${rpzName}"             #  is this a valid name?
         #  does this config already exist?  If yes, then exit
         if [[ -f "${rpzConfig}" ]] ; then
             msg_log "error: rpz: duplicate - ${rpzConfig} already exists. exit"
@@ -112,29 +62,28 @@ case "${theAction}" in
 
         #  is this a valid URL?
         regex='^https://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]'
-        if ! [[ "${theURL}" =~ $regex ]] ; then
-            msg_log "error: rpz: the URL is not valid: \"${theURL}\". exit."
+        if ! [[ "${rpzURL}" =~ $regex ]] ; then
+            msg_log "error: rpz: the URL is not valid: \"${rpzURL}\". exit."
             exit 105
         fi
 
         #  create the zone config file
-        msg_log "info: rpz: add config file \"${theName}.rpz.conf\""
 echo "rpz:
-    name:                   ${theName}.rpz
-    zonefile:               /etc/unbound/zonefiles/${theName}.rpz
-    url:                    ${theURL}
+    name:                   ${rpzName}.rpz
+    zonefile:               ${rpzFile}
+    url:                    ${rpzURL}
     rpz-action-override:    nxdomain
-    rpz-log:                yes
-    rpz-log-name:           ${theName}
-    rpz-signal-nxdomain-ra: yes
-" > "${rpzConfig}"
-        
-        #  set-up zonefile
-        #    create an empty rpz file
-        touch "${rpzFile}"
-        #  unbound requires these settings for rpz files
-        chown nobody:nobody "${rpzFile}" "${rpzConfig}"
-        chmod 644 "${rpzFile}" "${rpzConfig}"
+    rpz-log:                ${rpzLog}
+    rpz-log-name:           ${rpzName}
+    rpz-signal-nxdomain-ra: yes" > "${rpzConfig}"
+
+		#  set-up zonefile
+		#    create an empty rpz file if it does not exist
+		if [[ ! -f "${rpzFile}" ]] ; then
+			touch "${rpzFile}"
+			#  unbound requires these settings for rpz files
+ 			set_permissions "${rpzFile}" "${rpzConfig}"
+		fi
         ;;
 
     #  trash config file & rpz file
@@ -144,57 +93,29 @@ echo "rpz:
             exit 106
         fi
 
-        msg_log "info: rpz: remove config file & rpz file \"${theName}\""
+        msg_log "info: rpz: remove config file & rpz file \"${rpzName}\""
         rm "${rpzConfig}"
         rm "${rpzFile}"
-
-        check_unbound_conf
         ;;
 
-    #  make a new allow or block rpz file
-    make )
-        case "${theName}" in
-            allow )
-            make_rpz_file allow
-            ;;
+	reload )	check_unbound_conf "${checkConf}"	;;
 
-        block )
-            make_rpz_file block
-            ;;
-
-        allowblock )
-            make_rpz_file allow
-            make_rpz_file block
-            ;;
-
-        * )
-            msg_log "error: rpz: the NAME \"${theName}\" \
-              is not valid - \"allow\" or \"block\" only.  exit."
-            exit 107
-            ;;
-        esac
-
-        check_unbound_conf
+    list )
+		awk -F':' '/^\s*name:/{ NAME=$2 } \
+			/^\s*url:/{ NU=NAME"="$2":"$3 ; gsub(/[[:blank:]]|\.rpz/, "", NU) ; print NU }'  \
+		    /etc/unbound/local.d/*rpz.conf
+		exit
         ;;
 
-    *)
+    * )
         msg_log "error: rpz: missing or incorrect parameter"
-        printf "Usage:  rpzConfig <ACTION> <NAME> <URL>\n"
-        printf "Version:  ${version}\n"
+        printf "Usage:   $(basename "$0") <ACTION> <NAME> <URL> <OPTION> <OPTION>\n"
+        printf "Version: ${version}\n"
         exit 108
         ;;
 
 esac
 
-#  reload due to the changes
-msg_log  "rpz: running \"unbound-control reload\""
-unbound-control reload
-exit_code=$?
-if [[ "${exit_code}" -ne 0 ]] ; then
-    msg_log "error: rpz: unbound-control \"${theName}\". exit."
-    exit 109
-fi
-
-printf "${theName}=${theURL}\n"
+unbound_control_reload "${ucReload}"
 
 exit

@@ -1,0 +1,78 @@
+#!/bin/bash
+###############################################################################
+#                                                                             #
+#  IPFire.org - A linux based firewall                                        #
+#  Copyright (C) 2024  IPFire Team  <info@ipfire.org>                         #
+#                                                                             #
+#  This program is free software: you can redistribute it and/or modify       #
+#  it under the terms of the GNU General Public License as published by       #
+#  the Free Software Foundation, either version 3 of the License, or          #
+#  (at your option) any later version.                                        #
+#                                                                             #
+#  This program is distributed in the hope that it will be useful,            #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#  GNU General Public License for more details.                               #
+#                                                                             #
+#  You should have received a copy of the GNU General Public License          #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                             #
+###############################################################################
+
+#	version="2024-09-01   v01"
+
+###############     Functions     ###############
+
+msg_log () {
+    logger --tag "${tagName}" "$*"
+    if tty --silent ; then
+        echo "${tagName}:" "$*"
+    fi
+}
+
+#  check for a valid name
+check_name () {
+    local theName="${1}"
+
+    regex='^[a-zA-Z0-9_]+$'				# no dash or plus, alpha numeric only
+    regex1='^(allow|block)$'			# allow and block are reserved NAMEs
+    if [[ ! "${theName}" =~ $regex ]] || [[ "${theName}" =~ $regex1 ]] ; then
+        msg_log "error: rpz: the NAME is not valid: \"${theName}\". exit."
+        exit 101
+    fi
+}
+
+set_permissions () {
+ 	chown nobody:nobody "$@"
+ 	chmod 644 "$@"
+}
+
+check_unbound_conf () {
+	local thecheckConf="${1:-yes}"		#	check config default is yes
+
+    #  check the above config files
+    if [[ "${thecheckConf}" == yes ]] ; then
+		msg_log "info: rpz: check for errors with \"unbound-checkconf\""
+
+		if ! unbound-checkconf ; then
+			msg_log "error: rpz: unbound-checkconf found invalid configuration."
+			msg_log \
+			  "error: rpz: In Terminal run the command \"unbound-checkconf\" for more information. exit."
+			exit 102
+		fi
+    fi
+}
+
+unbound_control_reload () {
+	local theReload="${1:-yes}"		#	reload default is yes
+
+    if [[ "${theReload}" == yes ]] ; then
+        #  reload due to the changes
+        msg_log  "info: rpz: run \"unbound-control reload\""
+
+        if ! unbound-control reload ; then
+            msg_log "error: rpz: unbound-control reload. exit."
+            exit 109
+        fi
+    fi
+}
