@@ -19,12 +19,11 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-09-01 - v38"
+version="2024-09-03 - v39"
 
 ###############     Functions     ###############
 
-#source /usr/sbin/rpz-functions
-source /root/rpz/rpz-functions_v01.sh
+source /usr/sbin/rpz-functions
 
 ###############       Main        ###############
 
