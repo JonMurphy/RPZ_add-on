@@ -64,10 +64,12 @@ $(TARGET) :
 
 	# install RPZ scripts
 	install -v -m 755 \
-	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep} -t /usr/sbin
+	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep,rpz-allow-block,rpz-functions} \
+	  -t /usr/sbin
 
 	# Add conf file to /etc directory
 	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
+	cp -vf $(DIR_CONF)/rpz/block.rpz.conf /etc/unbound/local.d
 
 	# Install settings folder and two empty files
 	mkdir -pv /var/ipfire/dns/rpz
@@ -81,7 +83,10 @@ $(TARGET) :
 	touch /etc/unbound/zonefiles/block.rpz
 
 	#  set owner for unbound related files
-	chown -vR nobody:nobody /var/ipfire/dns/rpz /etc/unbound/zonefiles
+	chown -vR nobody:nobody  \
+	  /var/ipfire/dns/rpz    \
+	  /etc/unbound/zonefiles \
+	  /etc/unbound/local.d
 
 	# Install backup definition
 	cp -vf $(DIR_CONF)/backup/includes/rpz /var/ipfire/backup/addons/includes/rpz

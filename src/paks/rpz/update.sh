@@ -20,6 +20,24 @@
 ###############################################################################
 #
 . /opt/pakfire/lib/functions.sh
+
+#  from update.sh
 extract_backup_includes
-./uninstall.sh
-./install.sh
+
+#  stop unbound to delete RPZ conf file
+/etc/init.d/unbound stop
+
+#  from uninstall.sh
+make_backup ${NAME}
+remove_files
+
+#  delete rpz config files.  Otherwise unbound will throw error:
+#    "unbound-control[nn:0] error: connect: Connection refused for 127.0.0.1 port 8953"
+/bin/rm --verbose --force /etc/unbound/local.d/*.rpz.conf
+
+#  from install.sh
+extract_files
+restore_backup ${NAME}
+
+#  restart unbound to load config files
+/etc/init.d/unbound start
