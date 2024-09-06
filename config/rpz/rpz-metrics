@@ -19,12 +19,43 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-08-16"	# v20
+version="2024-09-04 - v21"
 
 ###############       Main        ###############
 
-weeks="${1:-2}"         #   default to two message logs
-sortBy="${2:-name}"     #   by name or by hits
+weeks="2"					#   default to two message logs
+sortBy="name"				#   default "by name"
+rpzActive="enabled"			#   default "enabled only"
+
+while [[ $# -gt 0 ]] ; do
+    case "$1" in
+		--by-names | --by-name )
+			sortBy="name"
+			;;
+
+		--by-hits | --by-hit )
+			sortBy="hit"
+			;;
+
+		--by-lines | --by-line )
+			sortBy="line"
+			;;
+
+		--enabled-only )
+			rpzActive="enabled"
+			;;
+
+		--active-all )
+			rpzActive="all"
+			;;
+
+		[0-9] | [0-9][0-9] )
+			weeks=$1
+			;;
+
+    esac
+    shift		# Shift after checking all the cases to get next option
+done
 
 #   get the list of message logs for N weeks
 messageLogs=$( find /var/log/messages* -type f | sort --version-sort |
@@ -39,7 +70,7 @@ rpzNameCount=$( for logf in ${messageLogs} ; do
 #   flip results and remove brackets `[` and `]`
 rpzNameCount=$( echo "${rpzNameCount}" |
     awk '{ print $2, $1 }' |
-      sed --regexp-extended 's|^\[(.*)\]|\1|' )
+    sed --regexp-extended 's|^\[(.*)\]|\1|' )
 
 #   grab only names
 rpzNames=$( echo "${rpzNameCount}" | awk '{ print $1 }' )
@@ -83,19 +114,21 @@ totalHits=0
 while read -r theName
 do
     printf -- "-"        #   pretend progress bar
-    #   get hit count
-    theHits="0"
-    if output=$( grep "^${theName}\s" <<< "${rpzNameCount}" ) ; then
-        theHits=$( echo "${output}" |
-        awk '{ print $2 }' )
-        totalHits=$(( totalHits + theHits ))
-    fi
 
     #   is this RPZ list active?
     theActive="disabled"
     if grep --quiet "^${theName}\.rpz" <<< "${ucListAuthZones}"
     then
         theActive="enabled"
+    else
+    	[[ "${rpzActive}" == enabled ]] && continue
+    fi
+
+    #   get hit count
+    theHits="0"
+    if output=$( grep "^${theName}\s" <<< "${rpzNameCount}" ) ; then
+        theHits=$( echo "${output}" | awk '{ print $2 }' )
+        totalHits=$(( totalHits + theHits ))
     fi
 
     #   get line count
@@ -118,15 +151,15 @@ do
 
     #   add to results list
     theResults+="${theName} ${theHits} ${theActive} ${theLines} ${hitsPerLine} ${theModDate}"$'\n'
-    
+
 done <<< "${rpzNames}"
 
 case "${sortBy}" in
-    names|name) sortArg=(-k3,3r -k1,1)          ;;  #   sort by "active" then by "name"
+    name) sortArg=(-k3,3r -k1,1)          ;;  #   sort by "active" then by "name"
 
-    hits|hit)   sortArg=(-k3,3r -k2,2nr -k1,1)  ;;  #   sort by "active" then by "hits" then by "name"
+    hit)  sortArg=(-k3,3r -k2,2nr -k1,1)  ;;  #   sort by "active" then by "hits" then by "name"
 
-    lines|line) sortArg=(-k3,3r -k4,4nr -k1,1)  ;;  #   sort by "active" then by "lines" then by "name"
+    line) sortArg=(-k3,3r -k4,4nr -k1,1)  ;;  #   sort by "active" then by "lines" then by "name"
 esac
 
 printf -- "--------------\n"

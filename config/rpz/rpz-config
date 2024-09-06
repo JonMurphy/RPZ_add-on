@@ -106,6 +106,10 @@ echo "rpz:
 		exit
         ;;
 
+	make )
+		rpz-make "${rpzName}"
+		;;
+
     * )
         msg_log "error: rpz: missing or incorrect parameter"
         printf "Usage:   $(basename "$0") <ACTION> <NAME> <URL> <OPTION> <OPTION>\n"
