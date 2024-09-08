@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-09-04 - v21"
+version="2024-09-08 - v21"
 
 ###############       Main        ###############
 
@@ -29,30 +29,17 @@ rpzActive="enabled"			#   default "enabled only"
 
 while [[ $# -gt 0 ]] ; do
     case "$1" in
-		--by-names | --by-name )
-			sortBy="name"
-			;;
+		--by-names | --by-name )	sortBy="name"	;;
 
-		--by-hits | --by-hit )
-			sortBy="hit"
-			;;
+		--by-hits | --by-hit )		sortBy="hit"	;;
 
-		--by-lines | --by-line )
-			sortBy="line"
-			;;
+		--by-lines | --by-line )	sortBy="line"	;;
 
-		--enabled-only )
-			rpzActive="enabled"
-			;;
+		--enabled-only )			rpzActive="enabled"	;;
 
-		--active-all )
-			rpzActive="all"
-			;;
+		--active-all )				rpzActive="all"		;;
 
-		[0-9] | [0-9][0-9] )
-			weeks=$1
-			;;
-
+		[0-9] | [0-9][0-9] )		weeks=$1		;;
     esac
     shift		# Shift after checking all the cases to get next option
 done
@@ -92,8 +79,7 @@ rpzNames=$( echo "${rpzNames}" | sort --unique  )
 lineCount=$( echo "${rpzFileList}" | xargs wc -l )
 
 #   get comment line count and blank line count for each RPZ
-commentCount=$( echo "${rpzFileList}" |
-    xargs grep --count -e "^$" -e "^;" )
+commentCount=$( echo "${rpzFileList}" | xargs grep --count -e "^$" -e "^;" )
 
 #   get modified date each RPZ
 modDateList=$( echo "${rpzFileList}" | xargs stat -c '%.10y  %n' )
