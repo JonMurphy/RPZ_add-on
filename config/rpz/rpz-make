@@ -25,10 +25,10 @@ version="2024-09-07   v03"
 
 source /usr/sbin/rpz-functions
 
-#	create the config file for allow
+#   create the config file for allow
 make_allow_config () {
-	local theLog="${1:-yes}"
-	local theConfig="/etc/unbound/local.d/00-rpz.conf"    #  output zone conf file
+    local theLog="${1:-yes}"
+    local theConfig="/etc/unbound/local.d/00-rpz.conf"    #  output zone conf file
 
     msg_log "info: rpz: make config file \"00-rpz.conf\""
 
@@ -43,14 +43,14 @@ rpz:
     rpz-log-name:           allow
     rpz-signal-nxdomain-ra: yes" > "${theConfig}"
 
-	#  set-up zonefile - unbound requires these settings for rpz files
-	set_permissions "${theConfig}"
+    #  set-up zonefile - unbound requires these settings for rpz files
+    set_permissions "${theConfig}"
 }
 
-#	create the config file for block
+#   create the config file for block
 make_block_config () {
-	local theLog="${1:-yes}"
-	local theConfig="/etc/unbound/local.d/block.rpz.conf"    #  output zone conf file
+    local theLog="${1:-yes}"
+    local theConfig="/etc/unbound/local.d/block.rpz.conf"    #  output zone conf file
 
     msg_log "info: rpz: make config file \"block.rpz.conf\""
 
@@ -62,13 +62,13 @@ echo "rpz:
     rpz-log-name:           block
     rpz-signal-nxdomain-ra: yes" > "${theConfig}"
 
-	#  set-up zonefile - unbound requires these settings for rpz files
-	set_permissions "${theConfig}"
+    #  set-up zonefile - unbound requires these settings for rpz files
+    set_permissions "${theConfig}"
 }
 
-#	create an RPZ file for allow or block
+#   create an RPZ file for allow or block
 make_rpz_file () {
-    local theName="${1}"    	#   allow or block
+    local theName="${1}"        #   allow or block
     local theAction='.'         # the default is nxdomain or block
     local actionList
 
@@ -78,14 +78,14 @@ make_rpz_file () {
     #  does a list exist?
     if [[ -s "${theList}" ]] ; then
 
-		# for allow set to passthru
-		[[ "${theName}" == allow ]] && theAction='rpz-passthru.'
+        # for allow set to passthru
+        [[ "${theName}" == allow ]] && theAction='rpz-passthru.'
 
-		#  drop any extra "blanks" and add "CNAME <RPZ action>." to each line
-		actionList=$( awk '{$1=$1};1' "${theList}" |
-			sed "/^[^;].*[[:alnum:]]/ s|$|  CNAME   ${theAction}|" )
+        #  drop any extra "blanks" and add "CNAME <RPZ action>." to each line
+        actionList=$( awk '{$1=$1};1' "${theList}" |
+            sed "/^[^;].*[[:alnum:]]/ s|$|  CNAME   ${theAction}|" )
 
-		msg_log "info: rpz: create zonefile for \"${theName}list\""
+        msg_log "info: rpz: create zonefile for \"${theName}list\""
 
 echo "; Name:             ${theName} list
 ; Last modified:    $(date "+%Y-%m-%d at %H.%M.%S %Z")
@@ -94,13 +94,13 @@ echo "; Name:             ${theName} list
 ;
 ${actionList}" > "${theZonefile}"
 
-	else
-		touch "${theZonefile}"
+    else
+        touch "${theZonefile}"
         msg_log "info: rpz: the ${theList} is empty."
-	fi
+    fi
 
-	#  set-up zonefile - unbound requires these settings for rpz files
- 	set_permissions "${theZonefile}"
+    #  set-up zonefile - unbound requires these settings for rpz files
+    set_permissions "${theZonefile}"
 }
 
 
@@ -108,45 +108,45 @@ ${actionList}" > "${theZonefile}"
 
 tagName="unbound"
 
-rpzName="${1}"                      					#  input RPZ name
+rpzName="${1}"                                          #  input RPZ name
 
 rpzConfig="/etc/unbound/local.d/${rpzName}.rpz.conf"    #  output zone conf file
 rpzFile="/etc/unbound/zonefiles/${rpzName}.rpz"         #  output for RPZ file
 
 rpzLog="yes"                        #  log default is yes
-ucReload="yes"						#  reload default is yes
+ucReload="yes"                      #  reload default is yes
 
 while [[ $# -gt 0 ]] ; do
     case "$1" in
-        --no-log )		rpzLog="no"   ;;
-        --no-reload )	ucReload="no" ;  checkConf="no" ;;
+        --no-log )      rpzLog="no"   ;;
+        --no-reload )   ucReload="no" ;  checkConf="no" ;;
     esac
-    shift		# Shift after checking all the cases to get next option
+    shift       # Shift after checking all the cases to get next option
 done
 
 case "${rpzName}" in
 
     #  make a new allow or block rpz file
-	allow )
-		make_allow_config "${rpzLog}"
-		make_rpz_file allow
-		;;
+    allow )
+        make_allow_config "${rpzLog}"
+        make_rpz_file allow
+        ;;
 
-	allowblock )
-		make_allow_config "${rpzLog}"
-		make_rpz_file allow
-		;&
+    allowblock )
+        make_allow_config "${rpzLog}"
+        make_rpz_file allow
+        ;&
 
-	block )
-		make_block_config "${rpzLog}"
-		make_rpz_file block
-		;;
+    block )
+        make_block_config "${rpzLog}"
+        make_rpz_file block
+        ;;
 
-	reload )
-		check_unbound_conf "${checkConf}"
-		;;
+    reload )
+        check_unbound_conf "${checkConf}"
+        ;;
 
-	* )
+    * )
         msg_log "error: rpz: missing or incorrect parameter"
         printf "Usage:   $(basename "$0") <NAME> <OPTION> <OPTION>\n"
         printf "Version: ${version}\n"
