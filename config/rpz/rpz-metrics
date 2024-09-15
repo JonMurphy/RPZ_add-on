@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-09-08 - v21"
+version="2024-09-14 - v22"
 
 ###############       Main        ###############
 
@@ -34,6 +34,8 @@ while [[ $# -gt 0 ]] ; do
         --by-hits | --by-hit )      sortBy="hit"    ;;
 
         --by-lines | --by-line )    sortBy="line"   ;;
+
+        --by-effect )				sortBy="effect"   ;;
 
         --enabled-only )            rpzActive="enabled" ;;
 
@@ -142,13 +144,16 @@ done <<< "${rpzNames}"
 
 case "${sortBy}" in
     #  sort by "active" then by "name"
-    name) sortArg=(-k3,3r -k1,1)          ;;
+    name) sortArg=(-k3,3r -k1,1)			;;
 
     #  sort by "active" then by "hits" then by "name"
-    hit)  sortArg=(-k3,3r -k2,2nr -k1,1)  ;;
+    hit)  sortArg=(-k3,3r -k2,2nr -k1,1)	;;
 
     #  sort by "active" then by "lines" then by "name"
-    line) sortArg=(-k3,3r -k4,4nr -k1,1)  ;;
+    line) sortArg=(-k3,3r -k4,4nr -k1,1)	;;
+
+    #  sort by "active" then by "effect" then by "name"
+    effect) sortArg=(-k3,3r -k5,5nr -k1,1)	;;
 esac
 
 printf -- "--------------\n"

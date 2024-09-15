@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-09-07   v03"
+version="2024-09-14   v05"
 
 ###############     Functions     ###############
 
@@ -78,6 +78,8 @@ make_rpz_file () {
     #  does a list exist?
     if [[ -s "${theList}" ]] ; then
 
+        validate_list "${theName}"          #   is the allow/block list valid?
+
         # for allow set to passthru
         [[ "${theName}" == allow ]] && theAction='rpz-passthru.'
 
@@ -103,15 +105,38 @@ ${actionList}" > "${theZonefile}"
     set_permissions "${theZonefile}"
 }
 
+#   check if allow/block list is valid
+validate_list () {
+    local theName="${1}"        #   allow or block
+    local theList="/var/ipfire/dns/rpz/${theName}list"  #  input custom list of domains
+
+#   '/^((([a-z0-9][a-z0-9\-]*[a-z0-9])|[a-z0-9]+)\.)*([a-z]+|xn\-\-[a-z0-9]+)\.?$/d ;
+#   '/^(([a-z0-9]([a-z0-9-]{0,62}[a-z0-9])*[\.]){1,20}([a-z]{2,61}|xn--[a-z0-9]{1,60}))$/d ;
+
+#   remove good:
+#       properly formated domain names
+#       properly formated wildcard domain names
+#       blank lines and comment lines
+#   remaining lines are "bad"
+    bad_lines=$( sed -E \
+    '/^(([a-z0-9]([a-z0-9-]{0,62}[a-z0-9])*[\.]){1,20}([a-z]{2,61}|xn--[a-z0-9]{1,60}))$/d ;
+    /^\*\.(([a-zA-Z0-9]{0,62})\.)*[a-zA-Z]{2,63}$/d ;
+    /^$/d ; /^;/d' "${theList}" )
+
+    if [[ ! -z "${bad_lines}" ]] ; then
+        msg_log "error: rpz: invalid line(s) in ${theList}."
+        bad_lines=$( echo "${bad_lines}" | tr -s '\r\n' ' ' )
+        printf "%s\n" "bad lines: ${bad_lines}"
+        exit 110
+    fi
+}
+
 
 ###############       Main        ###############
 
 tagName="unbound"
 
-rpzName="${1}"                                          #  input RPZ name
-
-rpzConfig="/etc/unbound/local.d/${rpzName}.rpz.conf"    #  output zone conf file
-rpzFile="/etc/unbound/zonefiles/${rpzName}.rpz"         #  output for RPZ file
+rpzName="${1}"                      #  input RPZ name
 
 rpzLog="yes"                        #  log default is yes
 ucReload="yes"                      #  reload default is yes
