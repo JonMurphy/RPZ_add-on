@@ -88,6 +88,10 @@ $(TARGET) :
 	  /etc/unbound/zonefiles \
 	  /etc/unbound/local.d
 
+	# Install addon-specific language-files.
+	install -v -m 004 $(DIR_SRC)/config/rpz/rpz.*.pl \
+		/var/ipfire/addon-lang/
+
 	# Install backup definition
 	cp -vf $(DIR_CONF)/backup/includes/rpz /var/ipfire/backup/addons/includes/rpz
 
