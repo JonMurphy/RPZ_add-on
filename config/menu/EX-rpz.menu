@@ -1,0 +1,5 @@
+$subipfire->{'20.rpz'} = {'caption' => 'RPZ',
+	'uri' => '/cgi-bin/dns-rpz.cgi',
+	'title' => "RPZ",
+	'enabled' => 1,
+};
