@@ -1,8 +1,0 @@
-# add a line for RPZ webgui page
-#	IPfire menu
-pakfire.cgi=configuration/ipfire/pakfire
-wlanap.cgi=addons/wireless
-tor.cgi=addons/tor
-mpfire.cgi=addons/mpfire
-samba.cgi=addons/samba
-dns-rpz=addons/rpz
