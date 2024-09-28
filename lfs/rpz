@@ -33,7 +33,7 @@ DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 
 PROG       = rpz
-PAK_VER    = 1
+PAK_VER    = 5
 
 DEPS       =
 
@@ -64,12 +64,12 @@ $(TARGET) :
 
 	# install RPZ scripts
 	install -v -m 755 \
-	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep,rpz-allow-block,rpz-functions} \
+	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep,rpz-make,rpz-functions} \
 	  -t /usr/sbin
 
 	# Add conf file to /etc directory
 	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
-	cp -vf $(DIR_CONF)/rpz/block.rpz.conf /etc/unbound/local.d
+# 	cp -vf $(DIR_CONF)/rpz/block.rpz.conf /etc/unbound/local.d
 
 	# Install settings folder and two empty files
 	mkdir -pv /var/ipfire/dns/rpz
@@ -80,7 +80,7 @@ $(TARGET) :
 	#  files to avoid a unbound config error
 	mkdir -pv /etc/unbound/zonefiles
 	touch /etc/unbound/zonefiles/allow.rpz
-	touch /etc/unbound/zonefiles/block.rpz
+# 	touch /etc/unbound/zonefiles/block.rpz
 
 	#  set owner for unbound related files
 	chown -vR nobody:nobody  \
