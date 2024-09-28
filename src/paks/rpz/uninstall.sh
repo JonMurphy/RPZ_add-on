@@ -31,5 +31,8 @@ remove_files
 #    "[1723428668] unbound-control[17117:0] error: connect: Connection refused for 127.0.0.1 port 8953"
 /bin/rm -fv /etc/unbound/local.d/*.rpz.conf
 
+# Update Language cache
+/usr/local/bin/update-lang-cache
+
 #  start unbound to load unbound config file
 /etc/init.d/unbound start

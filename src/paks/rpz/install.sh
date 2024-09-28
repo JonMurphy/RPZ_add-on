@@ -23,5 +23,8 @@
 extract_files
 restore_backup ${NAME}
 
+# Update Language cache
+/usr/local/bin/update-lang-cache
+
 #  restart unbound to load config file
 /etc/init.d/unbound restart
