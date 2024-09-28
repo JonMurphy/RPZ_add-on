@@ -63,24 +63,23 @@ $(TARGET) :
 	@rm -rf $(DIR_APP)
 
 	# install RPZ scripts
-	install -v -m 755 \
+	install --verbose --mode=755 \
 	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep,rpz-make,rpz-functions} \
-	  -t /usr/sbin
+	  --target-directory=/usr/sbin
 
-	# Add conf file to /etc directory
-	cp -vf $(DIR_CONF)/rpz/00-rpz.conf /etc/unbound/local.d
-# 	cp -vf $(DIR_CONF)/rpz/block.rpz.conf /etc/unbound/local.d
+	# Add install conf file to /etc/unbound directory
+	install --verbose --mode=644 --owner=nobody --group=nobody \
+	  $(DIR_CONF)/rpz/00-rpz.conf \
+	  --target-directory=/etc/unbound/local.d
 
-	# Install settings folder and two empty files
+	# Create settings folder and two empty files for lists
 	mkdir -pv /var/ipfire/dns/rpz
-	touch /var/ipfire/dns/rpz/allowlist
-	touch /var/ipfire/dns/rpz/blocklist
+	touch /var/ipfire/dns/rpz/{allowlist,blocklist}
 
-	# create zonefiles directory for the RPZ files and add two empty RPZ
-	#  files to avoid a unbound config error
+	# create zonefiles directory for the RPZ files and
+	#   add empty RPZ config file to avoid a unbound config error
 	mkdir -pv /etc/unbound/zonefiles
 	touch /etc/unbound/zonefiles/allow.rpz
-# 	touch /etc/unbound/zonefiles/block.rpz
 
 	#  set owner for unbound related files
 	chown -vR nobody:nobody  \
@@ -88,9 +87,9 @@ $(TARGET) :
 	  /etc/unbound/zonefiles \
 	  /etc/unbound/local.d
 
-	# Install addon-specific language-files.
-	install -v -m 004 $(DIR_SRC)/config/rpz/rpz.*.pl \
-		/var/ipfire/addon-lang/
+	# Install addon-specific language-files
+	install --verbose --mode=004 $(DIR_CONF)/rpz/rpz.*.pl \
+	  --target-directory=/var/ipfire/addon-lang
 
 	# Install backup definition
 	cp -vf $(DIR_CONF)/backup/includes/rpz /var/ipfire/backup/addons/includes/rpz
