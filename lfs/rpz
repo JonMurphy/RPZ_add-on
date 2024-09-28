@@ -62,7 +62,7 @@ $(TARGET) :
 	@$(PREBUILD)
 	@rm -rf $(DIR_APP)
 
-	# install RPZ scripts
+	#  RPZ scripts
 	install --verbose --mode=755 \
 	  $(DIR_CONF)/rpz/{rpz-config,rpz-metrics,rpz-sleep,rpz-make,rpz-functions} \
 	  --target-directory=/usr/sbin
