@@ -1,4 +1,4 @@
-#  Added for Response Policy Zone (RPZ)
+#  Added for Response Policy Zone (RPZ) add-on
 %tr = (%tr,
 'rpz' => 'Response Policy Zones (RPZ)',
 'rpz zf' => 'Zonefiles',
@@ -7,9 +7,9 @@
 'rpz zf remark info' => 'Valid characters are a-z, A-Z, 0-9 and underscore.',
 'rpz cl' => 'Custom lists',
 'rpz cl allow' => 'Custom allowlist',
-'rpz cl allow info' => 'Allowed domains (one per line)',
+'rpz cl allow info' => 'Allowed domains (one per line)<br>Example: domain.com, *.domain.com',
 'rpz cl block' => 'Custom blocklist',
-'rpz cl block info' => 'Blocked domains (one per line)',
+'rpz cl block info' => 'Blocked domains (one per line)<br>Example: domain.com, *.domain.com',
 'rpz cl allow enable' => 'Enable custom allowlist:',
 'rpz cl block enable' => 'Enable custom blocklist:',
 'rpz exitcode 101' => 'the NAME is not valid',
