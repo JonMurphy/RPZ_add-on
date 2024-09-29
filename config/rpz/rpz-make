@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-09-14   v05"
+version="2024-09-29   v07"
 
 ###############     Functions     ###############
 
@@ -28,7 +28,7 @@ source /usr/sbin/rpz-functions
 #   create the config file for allow
 make_allow_config () {
     local theLog="${1:-yes}"
-    local theConfig="/etc/unbound/local.d/00-rpz.conf"    #  output zone conf file
+    local theConfig="/etc/unbound/rpz.d/00-rpz.conf"    #  output zone conf file
 
     msg_log "info: rpz: make config file \"00-rpz.conf\""
 
@@ -50,7 +50,7 @@ rpz:
 #   create the config file for block
 make_block_config () {
     local theLog="${1:-yes}"
-    local theConfig="/etc/unbound/local.d/block.rpz.conf"    #  output zone conf file
+    local theConfig="/etc/unbound/rpz.d/block.rpz.conf"    #  output zone conf file
 
     msg_log "info: rpz: make config file \"block.rpz.conf\""
 
@@ -103,6 +103,8 @@ ${actionList}" > "${theZonefile}"
 
     #  set-up zonefile - unbound requires these settings for rpz files
     set_permissions "${theZonefile}"
+    #  set-up allow/block list files
+    set_permissions "${theList}"
 }
 
 #   check if allow/block list is valid
@@ -154,17 +156,17 @@ case "${rpzName}" in
     #  make a new allow or block rpz file
     allow )
         make_allow_config "${rpzLog}"
-        make_rpz_file allow
+        make_rpz_file 'allow'
         ;;
 
     allowblock )
         make_allow_config "${rpzLog}"
-        make_rpz_file allow
+        make_rpz_file 'allow'
         ;&
 
     block )
         make_block_config "${rpzLog}"
-        make_rpz_file block
+        make_rpz_file 'block'
         ;;
 
     reload )

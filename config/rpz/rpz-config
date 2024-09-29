@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-09-03 - v39"
+version="2024-09-29 - v40"
 
 ###############     Functions     ###############
 
@@ -35,7 +35,7 @@ rpzURL="${3}"                       #  input RPZ URL
 rpzOption1="${4}"                   #  input RPZ option #1
 rpzOption2="${5}"                   #  input RPZ option #2
 
-rpzConfig="/etc/unbound/local.d/${rpzName}.rpz.conf"    #  output zone conf file
+rpzConfig="/etc/unbound/rpz.d/${rpzName}.rpz.conf"    #  output zone conf file
 rpzFile="/etc/unbound/zonefiles/${rpzName}.rpz"         #  output for RPZ file
 
 rpzLog="yes"                        #  log default is yes
@@ -102,7 +102,7 @@ echo "rpz:
     list )
 		awk -F':' '/^\s*name:/{ NAME=$2 } \
 			/^\s*url:/{ NU=NAME"="$2":"$3 ; gsub(/[[:blank:]]|\.rpz/, "", NU) ; print NU }'  \
-		    /etc/unbound/local.d/*rpz.conf
+		    /etc/unbound/rpz.d/*rpz.conf
 		exit
         ;;
 

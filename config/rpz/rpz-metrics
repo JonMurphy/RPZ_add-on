@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-09-14 - v22"
+version="2024-09-17 - v23"
 
 ###############       Main        ###############
 
@@ -52,7 +52,7 @@ messageLogs=$( find /var/log/messages* -type f | sort --version-sort |
 
 #  get the list of RPZ names & counts from the message log(s)
 rpzNameCount=$( for logf in ${messageLogs} ; do
-    zgrep --text --extended-regexp 'info: rpz: applied.* A IN$' "${logf}" |
+    zgrep --text --fixed-strings 'info: rpz: applied' "${logf}" |
       awk '$10 ~ /\[\w*]/ { print $10 }' ;
     done | sort | uniq --count )
 
