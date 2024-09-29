@@ -3,4 +3,4 @@
 #
 #	IPfire menu
 #
-dns-rpz=addons/rpz
+rpz.cgi=addons/rpz
