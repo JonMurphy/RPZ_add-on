@@ -1,4 +1,4 @@
 /var/ipfire/dns/rpz/*
 /etc/unbound/zonefiles/allow.rpz
 /etc/unbound/zonefiles/block.rpz
-/etc/unbound/local.d/*rpz.conf
+/etc/unbound/rpz.d/*rpz.conf

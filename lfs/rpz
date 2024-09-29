@@ -26,14 +26,14 @@ include Config
 
 SUMMARY    = response policy zone - RPZ reputation system for unbound DNS
 
-VER        = beta-0.1.5
+VER        = beta-0.1.6
 
 THISAPP    = rpz-$(VER)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 
 PROG       = rpz
-PAK_VER    = 5
+PAK_VER    = 6
 
 DEPS       =
 
@@ -68,10 +68,11 @@ $(TARGET) :
 	  --target-directory=/usr/sbin
 
 	#  RPZ config files
-	chown --verbose --recursive nobody:nobody /etc/unbound/local.d
+	mkdir -pv /etc/unbound/rpz.d
+	chown --verbose --recursive nobody:nobody /etc/unbound/rpz.d
 	install --verbose --mode=644 --owner=nobody --group=nobody \
 	  $(DIR_CONF)/rpz/00-rpz.conf \
-	  --target-directory=/etc/unbound/local.d
+	  --target-directory=/etc/unbound/rpz.d.d
 
 	#  RPZ custom list files for allow and block
 	mkdir -pv /var/ipfire/dns/rpz
