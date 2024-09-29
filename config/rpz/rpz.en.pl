@@ -1,44 +1,28 @@
 #  Added for Response Policy Zone (RPZ)
 %tr = (%tr,
-'rpz' => 'Response Policy Zone (RPZ)',
-'rpz domain' => 'Domain',
-'rpz ip statistics' => 'IP Statistics',
-'rpz ip address' => 'IP Address',
-'rpz list' => 'RPZ lists',
-'rpz number of blocked domains' => 'Number of Blocked Domains',
-'rpz number of requests' => 'Number of blocked requests',
-'rpz total number of blocked requests' => 'Total number of blocked requests',
-'rpz percentage' => 'Percentage',
-'rpz statistics' => 'RPZ statistics',
-'rpz top 10 blocked domains' => 'Top 10 of blocked domains',
-'rpz top 10 client ips' => 'Top 10 of client IPs',
-'rpz total blocked bytes' => 'Blocked bytes',
-'rpz unbound logs' => 'RPZ log viewer',
+'rpz' => 'Response Policy Zones (RPZ)',
+'rpz zf' => 'Zonefiles',
+'rpz zf imported' => '(imported from rpz-config)',
+'rpz zf editor' => 'Edit zonefiles entry',
+'rpz zf remark info' => 'Valid characters are a-z, A-Z, 0-9 and underscore.',
+'rpz cl' => 'Custom lists',
+'rpz cl allow' => 'Custom allowlist',
+'rpz cl allow info' => 'Allowed domains (one per line)',
+'rpz cl block' => 'Custom blocklist',
+'rpz cl block info' => 'Blocked domains (one per line)',
+'rpz cl allow enable' => 'Enable custom allowlist:',
+'rpz cl block enable' => 'Enable custom blocklist:',
+'rpz exitcode 101' => 'the NAME is not valid',
+'rpz exitcode 102' => 'unbound-checkconf found invalid configuration. In the Terminal run the command unbound-checkconf for more information',
+'rpz exitcode 103' => 'the allow/block list is empty',
+'rpz exitcode 104' => 'duplicate - NAME already exists',
+'rpz exitcode 105' => 'the URL is not valid"',
+'rpz exitcode 106' => 'cannot remove the NAME does not exist',
+'rpz exitcode 107' => 'the NAME is not valid - "allow" or "block" only',
+'rpz exitcode 108' => 'missing or incorrect parameter"',
+'rpz exitcode 109' => 'unbound-control reload failed',
+'rpz exitcode 201' => 'the REMARK is not valid',
+'rpz exitcode 202' => 'invalid entry in allowlist, line ',
+'rpz exitcode 203' => 'invalid entry in blocklist, line ',
+'rpz exitcode 204' => 'Selected entry does not exist: ',
 );
-
-# Zone files
-#
-# Name
-# URL
-# Remark
-# Action
-#
-# Add
-# Update
-# Save
-#
-# Custom lists
-# Custom allowlist
-# Custom blocklist
-# Allowed domains (one per line), infotext
-# Blocked domains (one per line), infotext
-# Enable custom allowlist:
-# Enable custom blocklist:
-#
-# Edit zonefiles entry
-# Name: *
-# URL: *
-# Remark:
-# * Required field
-# Save
-# Back

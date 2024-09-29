@@ -19,21 +19,13 @@
 #                                                                             #
 ###############################################################################
 
-##### TODO LIST #####
-# test form validation
-# remove debug code
-# use $Lang::tr
-# add cgi to menu
-# check for httpd warnings
-#####################
-
 use strict;
 use Scalar::Util qw(looks_like_number);
 
 # debugging
-use warnings;
-use CGI::Carp 'fatalsToBrowser';
-use Data::Dumper;
+#use warnings;
+#use CGI::Carp 'fatalsToBrowser';
+#use Data::Dumper;
 
 require '/var/ipfire/general-functions.pl';
 require "${General::swroot}/lang.pl";
@@ -117,7 +109,7 @@ my $action_key = $cgiparams{'KEY'} // ''; # entry being edited, empty = none/new
 # Zonefiles action: Check whether the requested entry exists
 if((substr($action, 0, 3) eq 'ZF_') && ($action_key)) {
 	unless(defined $zonefiles{$action_key}) {
-		$errormessage = "Selected entry does not exist: " . &Header::escape($action_key);
+		$errormessage = &_rpz_error_tr(204, $action_key);
 		$action = 'NONE';
 	}
 }
@@ -164,7 +156,7 @@ if($action eq 'ZF_SAVE') {				## Save new or modified zonefiles entry
 &Header::showhttpheaders();
 
 # Start HTML
-&Header::openpage("DNS RPZ", 1, $extraHead);
+&Header::openpage($Lang::tr{'rpz'}, 1, $extraHead);
 &Header::openbigbox('100%', 'left', '');
 
 # Show error messages
@@ -212,7 +204,7 @@ sub _zonefiles_load {
 		# Unique names are already guaranteed by rpz-config
 		if(&_rpz_validate_zonefile($name, $url, '', 0) == 0) {
 			# Populate global data hash, mark all found entries as enabled
-			my %entry = ('enabled' => 'on', 'url' => $url, 'remark' => "(imported from rpz-config)");
+			my %entry = ('enabled' => 'on', 'url' => $url, 'remark' => $Lang::tr{'rpz zf imported'});
 			$zonefiles{$name} = \%entry;
 		}
 	}
@@ -330,7 +322,7 @@ sub _customlist_export {
 			print $FH "$line\n";
 		}
 	} else {
-		print $FH "; This list is currently disabled by dns-rpz.cgi\n";
+		print $FH "; Note: This list is currently disabled by $ENV{'SCRIPT_NAME'}\n";
 	}
 
 	close($FH);
@@ -351,7 +343,7 @@ sub _print_message {
 
 # Show all zone files and related gui elements
 sub _print_zonefiles {
-	&Header::openbox('100%', 'left', "Zone files");
+	&Header::openbox('100%', 'left', $Lang::tr{'rpz zf'});
 
 	print <<END
 <table class="tbl" width="100%">
@@ -437,7 +429,7 @@ sub _print_zonefile_editor {
 	$cgiparams{'ZF_URL'} //= "";
 	$cgiparams{'ZF_REMARK'} //= "";
 
-	&Header::openbox('100%', 'left', "Edit zonefiles entry");
+	&Header::openbox('100%', 'left', $Lang::tr{'rpz zf editor'});
 
 	print <<END
 <form method="post" action="$ENV{'SCRIPT_NAME'}">
@@ -445,7 +437,7 @@ sub _print_zonefile_editor {
 <table width="100%">
 	<tr>
 		<td width="20%">$Lang::tr{'name'}:&nbsp;<img src="/blob.gif" alt="*"></td>
-		<td><input type="text" name="ZF_NAME" value="$cgiparams{'ZF_NAME'}" size="40" maxlength="32" title="Valid characters are a-z, A-Z, 0-9 and underscore." pattern="[a-zA-Z0-9_]{1,32}" required></td>
+		<td><input type="text" name="ZF_NAME" value="$cgiparams{'ZF_NAME'}" size="40" maxlength="32" title="$Lang::tr{'rpz zf remark info'}" pattern="[a-zA-Z0-9_]{1,32}" required></td>
 	</tr>
 	<tr>
 		<td width="20%">URL:&nbsp;<img src="/blob.gif" alt="*"></td>
@@ -500,23 +492,23 @@ sub _print_customlists {
 	# Disable reload button if not needed
 	my $reload_state = &_rpz_needs_reload() ? "" : " disabled";
 
-	&Header::openbox('100%', 'left', "Custom lists");
+	&Header::openbox('100%', 'left', $Lang::tr{'rpz cl'});
 
 	print <<END
 <form method="post" action="$ENV{'SCRIPT_NAME'}">
 <table width="100%">
 	<tr>
-		<td colspan="2"><b>Custom allowlist</b><br>Allowed domains (one per line), infotext</td>
-		<td colspan="2"><b>Custom blocklist</b><br>Blocked domains (one per line), infotext</td>
+		<td colspan="2"><b>$Lang::tr{'rpz cl allow'}</b><br>$Lang::tr{'rpz cl allow info'}</td>
+		<td colspan="2"><b>$Lang::tr{'rpz cl block'}</b><br>$Lang::tr{'rpz cl block info'}</td>
 	</tr>
 	<tr>
 		<td colspan="2"><textarea name="ALLOW_LIST" class="domainlist" cols="45">$cgiparams{'ALLOW_LIST'}</textarea></td>
 		<td colspan="2"><textarea name="BLOCK_LIST" class="domainlist" cols="45">$cgiparams{'BLOCK_LIST'}</textarea></td>
 	</tr>
 	<tr>
-		<td><label for="allow_enabled">Enable custom allowlist:</label></td>
+		<td><label for="allow_enabled">$Lang::tr{'rpz cl allow enable'}</label></td>
 		<td width="15%"><input type="checkbox" name="ALLOW_ENABLED" id="allow_enabled"$checked{'ALLOW_ENABLED'}></td>
-		<td><label for="block_enabled">Enable custom blocklist:</label></td>
+		<td><label for="block_enabled">$Lang::tr{'rpz cl block enable'}</label></td>
 		<td width="15%"><input type="checkbox" name="BLOCK_ENABLED" id="block_enabled"$checked{'BLOCK_ENABLED'}></td>
 	</tr>
 	<tr>
@@ -706,31 +698,12 @@ sub _rpz_error_tr {
 
 	# Translate numeric exit codes
 	if(looks_like_number($error)) {
-		if(defined $Lang::tr{"dnsrpz_exit-$error"}) {
-			$error = $Lang::tr{"dnsrpz_exit-$error"};
+		if(defined $Lang::tr{"rpz exitcode $error"}) {
+			$error = $Lang::tr{"rpz exitcode $error"};
 		}
 	}
 
-	# TODO move this to lang::tr, check for integer
-	my %messages = ('101' => "the NAME is not valid",
-		'102' => "unbound-checkconf found invalid configuration. In the Terminal run the command unbound-checkconf for more information",
-		'103' => "the allow/block list is empty",
-		'104' => "duplicate - NAME already exists",
-		'105' => "the URL is not valid",
-		'106' => "cannot remove the NAME does not exist",
-		'107' => "the NAME is not valid - \"allow\" or \"block\" only",
-		'108' => "missing or incorrect parameter",
-		'109' => "unbound-control reload failed",
-
-		'201' => "the REMARK is not valid",
-		'202' => "invalid entry in allowlist, line ",
-		'203' => "invalid entry in blocklist, line ");
-
-	if(exists $messages{$error}) {
-		$error = $messages{$error};
-	}
-
-	return "RPZ $Lang::tr{'error'}: $error$append";
+	return "RPZ $Lang::tr{'error'}: $error" . &Header::escape($append);
 }
 
 # Check result of rpz-config system call, request reload on success
