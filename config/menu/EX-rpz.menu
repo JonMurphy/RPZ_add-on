@@ -1,6 +1,6 @@
 $subipfire->{'20.rpz'} = {
     'caption' => $Lang::tr{'rpz'},
-    'uri' => '/cgi-bin/dns-rpz.cgi',
+    'uri' => '/cgi-bin/rpz.cgi',
     'title' => "RPZ",
     'enabled' => 1,
 };
