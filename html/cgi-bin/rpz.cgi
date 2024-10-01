@@ -404,7 +404,7 @@ END
 	<form method="post" action="$ENV{'SCRIPT_NAME'}">
 		<input type="hidden" name="KEY" value="">
 		<button type="submit" name="ACTION" value="ZF_EDIT">$Lang::tr{'add'}</button>
-		<button type="submit" name="ACTION" value="RPZ_RELOAD"$reload_state>$Lang::tr{'update'}</button>
+		<button type="submit" name="ACTION" value="RPZ_RELOAD"$reload_state>$Lang::tr{'rpz apply'}</button>
 	</form>
 </div>
 END
@@ -517,7 +517,7 @@ sub _print_customlists {
 	<tr>
 		<td align="right" colspan="4">
 			<button type="submit" name="ACTION" value="CL_SAVE">$Lang::tr{'save'}</button>
-			<button type="submit" name="ACTION" value="RPZ_RELOAD"$reload_state>$Lang::tr{'update'}</button>
+			<button type="submit" name="ACTION" value="RPZ_RELOAD"$reload_state>$Lang::tr{'rpz apply'}</button>
 		</td>
 </table>
 </form>
