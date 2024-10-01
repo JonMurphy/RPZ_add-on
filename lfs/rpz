@@ -72,7 +72,7 @@ $(TARGET) :
 	chown --verbose --recursive nobody:nobody /etc/unbound/rpz.d
 	install --verbose --mode=644 --owner=nobody --group=nobody \
 	  $(DIR_CONF)/rpz/00-rpz.conf \
-	  --target-directory=/etc/unbound/rpz.d.d
+	  --target-directory=/etc/unbound/rpz.d
 
 	#  RPZ custom list files for allow and block
 	mkdir -pv /var/ipfire/dns/rpz
