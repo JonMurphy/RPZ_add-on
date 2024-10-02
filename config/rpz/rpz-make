@@ -28,7 +28,7 @@ source /usr/sbin/rpz-functions
 #   create the config file for allow
 make_allow_config () {
     local theLog="${1:-yes}"
-    local theConfig="/etc/unbound/rpz.d/00-rpz.conf"    #  output zone conf file
+    local theConfig="/etc/unbound/local.d/00-rpz.conf"    #  output zone conf file
 
     msg_log "info: rpz: make config file \"00-rpz.conf\""
 
@@ -50,7 +50,7 @@ rpz:
 #   create the config file for block
 make_block_config () {
     local theLog="${1:-yes}"
-    local theConfig="/etc/unbound/rpz.d/block.rpz.conf"    #  output zone conf file
+    local theConfig="/etc/unbound/local.d/block.rpz.conf"    #  output zone conf file
 
     msg_log "info: rpz: make config file \"block.rpz.conf\""
 

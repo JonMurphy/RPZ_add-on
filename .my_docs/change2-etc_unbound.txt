@@ -1,2 +1,0 @@
-# Import any RPZ configurations
-include: "/etc/unbound/rpz.d/*.conf"
