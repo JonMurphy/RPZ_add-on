@@ -1,0 +1,6 @@
+#  add to `/home/jon/development6/ipfire-2.x/config/rootfiles/packages/rpz`
+
+
+var/ipfire/menu.d/EX-rpz.menu
+
+srv/web/ipfire/cgi-bin/rpz.cgi

@@ -39,6 +39,10 @@ remove_files
 extract_files
 restore_backup ${NAME}
 
+#	fix user created config files
+chown nobody:nobody /var/ipfire/dns/rpz
+chmod 644 /var/ipfire/dns/rpz
+
 # Update Language cache
 /usr/local/bin/update-lang-cache
 
