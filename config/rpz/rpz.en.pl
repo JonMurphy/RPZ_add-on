@@ -18,6 +18,7 @@
 'rpz exitcode 107' => 'the NAME is not valid - "allow" or "block" only',
 'rpz exitcode 108' => 'missing or incorrect parameter"',
 'rpz exitcode 109' => 'unbound-control reload failed',
+'rpz exitcode 110' => 'custom Allowlist/Blocklist contains invalid entries',
 'rpz exitcode 201' => 'the REMARK is not valid',
 'rpz exitcode 202' => 'invalid entry in allowlist, line ',
 'rpz exitcode 203' => 'invalid entry in blocklist, line ',
