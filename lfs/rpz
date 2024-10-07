@@ -89,10 +89,6 @@ $(TARGET) :
 	install --verbose --mode=004 $(DIR_CONF)/rpz/rpz.*.pl \
 	  --target-directory=/var/ipfire/addon-lang
 
-	# install RPZ menu and webgui
-	install -v -m 644 $(DIR_CONF)/menu/EX-rpz.menu /var/ipfire/menu.d/
-	# install -v -m 755 $(DIR_APP)/html/cgi-bin/rpz.cgi /srv/web/ipfire/cgi-bin/
-
 	# Install backup definition
 	cp -vf $(DIR_CONF)/backup/includes/rpz /var/ipfire/backup/addons/includes/rpz
 
