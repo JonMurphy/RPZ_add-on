@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-10-10   v08"
+version="2024-10-11   v08"
 
 ###############     Functions     ###############
 
@@ -134,7 +134,7 @@ validate_list () {
     if [[ ! -z "${bad_lines}" ]] ; then
         msg_log "error: rpz: invalid line(s) in ${theList}."
         #bad_lines=$( echo "${bad_lines}" | tr -s '\r\n' ' ' )
-        printf "%s\n" "bad lines: ${bad_lines}"
+        printf "%s\n" "bad line(s): ${bad_lines}"
         exit 110
     fi
 }
