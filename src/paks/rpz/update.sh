@@ -39,8 +39,9 @@ remove_files
 extract_files
 restore_backup ${NAME}
 
-#	fix user created config files
+#	fix user created files
 chown --verbose --recursive nobody:nobody /var/ipfire/dns/rpz
+chown --verbose --recursive nobody:nobody /etc/unbound/zonefiles
 
 # Update Language cache
 /usr/local/bin/update-lang-cache
