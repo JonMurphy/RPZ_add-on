@@ -26,14 +26,14 @@ include Config
 
 SUMMARY    = response policy zone - RPZ reputation system for unbound DNS
 
-VER        = beta-0.1.9
+VER        = beta-0.1.10
 
 THISAPP    = rpz-$(VER)
 DIR_APP    = $(DIR_SRC)/$(THISAPP)
 TARGET     = $(DIR_INFO)/$(THISAPP)
 
 PROG       = rpz
-PAK_VER    = 9
+PAK_VER    = 10
 
 DEPS       =
 
