@@ -69,21 +69,21 @@ $(TARGET) :
 
 	#  RPZ config files
 	mkdir -pv /etc/unbound/local.d
-	chown --verbose --recursive nobody:nobody /etc/unbound/local.d
 	install --verbose --mode=644 --owner=nobody --group=nobody \
 	  $(DIR_CONF)/rpz/00-rpz.conf \
 	  --target-directory=/etc/unbound/local.d
+	chown --verbose --recursive nobody:nobody /etc/unbound/local.d
 
 	#  RPZ custom list files for allow and block
 	mkdir -pv /var/ipfire/dns/rpz
-	chown --verbose --recursive nobody:nobody /var/ipfire/dns/rpz
 	touch /var/ipfire/dns/rpz/{allowlist,blocklist}
+	chown --verbose --recursive nobody:nobody /var/ipfire/dns/rpz
 
 	#  RPZ zone files
 	#   create empty RPZ config file to avoid a unbound config error
 	mkdir -pv /etc/unbound/zonefiles
-	chown --verbose --recursive nobody:nobody /etc/unbound/zonefiles
 	touch /etc/unbound/zonefiles/allow.rpz
+	chown --verbose --recursive nobody:nobody /etc/unbound/zonefiles
 
 	# Install addon-specific language-files
 	install --verbose --mode=004 $(DIR_CONF)/rpz/rpz.*.pl \
