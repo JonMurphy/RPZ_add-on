@@ -38,7 +38,6 @@ jon@deb11HPZ:~
 `rpz.cgi=addons/rpz`
 
 
-
 #### 5. add new lines for correct build
  - add to `./ipfire-2.x/config/rootfiles/packages/rpz`
 
