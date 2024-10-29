@@ -16,7 +16,7 @@
 'rpz exitcode 105' => 'l\'URL non è valido',
 'rpz exitcode 106' => 'non è possibile rimuovere il NOME non esiste',
 'rpz exitcode 107' => 'il NOME non è valido - solo "consenti" o "blocca"',
-'rpz exitcode 108' => 'parametro mancante o non corretto"',
+'rpz exitcode 108' => 'parametro mancante o non corretto',
 'rpz exitcode 109' => 'ricaricamento del controllo non associato non riuscito',
 'rpz exitcode 110' => 'la Whitelist/Blacklist personalizzata contiene voci non valide',
 'rpz exitcode 201' => 'l"OSSERVAZIONE non è valida',

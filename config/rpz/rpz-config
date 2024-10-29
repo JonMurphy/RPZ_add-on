@@ -101,7 +101,7 @@ echo "rpz:
 
     list )
 		awk -F':' '/^\s*name:/{ NAME=$2 } \
-			/^\s*url:/{ NU=NAME"="$2":"$3 ; gsub(/[[:blank:]]|\.rpz/, "", NU) ; print NU }'  \
+			/^\s*url:/{ NU=NAME"="$2":"$3 ; gsub(/[[:blank:]]|\.rpz=/, "", NU) ; print NU }'  \
 		    /etc/unbound/local.d/*rpz.conf
 		exit
         ;;

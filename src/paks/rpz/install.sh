@@ -24,9 +24,10 @@ extract_files
 restore_backup ${NAME}
 
 #	fix user created files
-chown --verbose --recursive nobody:nobody /var/ipfire/dns/rpz
-chown --verbose --recursive nobody:nobody /etc/unbound/zonefiles
-chown --verbose --recursive nobody:nobody /etc/unbound/local.d
+chown --verbose --recursive nobody:nobody \
+	/var/ipfire/dns/rpz    \
+	/etc/unbound/zonefiles \
+	/etc/unbound/local.d
 
 # Update Language cache
 /usr/local/bin/update-lang-cache

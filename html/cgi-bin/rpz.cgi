@@ -56,6 +56,9 @@ my $extraHead = <<END
 		overflow: auto;
 		white-space: pre;
 	}
+	button[type=submit]:disabled {
+		opacity: 0.6;
+	}
 </style>
 END
 ;
