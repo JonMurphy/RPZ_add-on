@@ -6,7 +6,7 @@
  - bug: `rpz-config list` displayed URL incorrectly (thank you Bernhard)
 #### rpz.cgi:
  - bug: remove extra `"` in language files (thank you Bernhard)
-
+ - feature: slightly dim "apply" button when not enabled
 
 ## rpz-beta-0.1.13-13.ipfire on 2024-10-27
  - skipped (error in change to config script)
