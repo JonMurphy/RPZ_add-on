@@ -23,7 +23,7 @@
 
 ## rpz-beta-0.1.12-12.ipfire on 2024-10-21
 #### rpz.cgi:
- - feature: added new language file for French (thank you gw-ipfire)
+ - feature: added new language file for French  (thank you gw-ipfire)
 
 
 ## rpz-beta-0.1.11-11.ipfire on 2024-10-18
