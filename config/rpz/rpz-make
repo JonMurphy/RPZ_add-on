@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-10-11   v08"
+version="2024-11-03 - v09"
 
 ###############     Functions     ###############
 
@@ -29,19 +29,25 @@ source /usr/sbin/rpz-functions
 make_allow_config () {
     local theLog="${1:-yes}"
     local theConfig="/etc/unbound/local.d/00-rpz.conf"    #  output zone conf file
+    local theList="/var/ipfire/dns/rpz/allowlist"         #  input custom list of domains
 
     msg_log "info: rpz: make config file \"00-rpz.conf\""
 
 echo "server:
-    module-config: \"respip validator iterator\"
+    module-config: \"respip validator iterator\"" > "${theConfig}"
 
-rpz:
+    #  does allow list exist?
+    if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
+
+echo "rpz:
     name:                   allow.rpz
     zonefile:               /etc/unbound/zonefiles/allow.rpz
     rpz-action-override:    passthru
     rpz-log:                ${theLog}
     rpz-log-name:           allow
-    rpz-signal-nxdomain-ra: yes" > "${theConfig}"
+    rpz-signal-nxdomain-ra: yes" >> "${theConfig}"
+
+    fi
 
     #  set-up zonefile - unbound requires these settings for rpz files
     set_permissions "${theConfig}"
@@ -50,9 +56,13 @@ rpz:
 #   create the config file for block
 make_block_config () {
     local theLog="${1:-yes}"
-    local theConfig="/etc/unbound/local.d/block.rpz.conf"    #  output zone conf file
+    local theConfig="/etc/unbound/local.d/block.rpz.conf"   #  output zone conf file
+    local theList="/var/ipfire/dns/rpz/blocklist"           #  input custom list of domains
 
     msg_log "info: rpz: make config file \"block.rpz.conf\""
+
+    #  does block list exist?
+    if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
 
 echo "rpz:
     name:                   block.rpz
@@ -62,8 +72,13 @@ echo "rpz:
     rpz-log-name:           block
     rpz-signal-nxdomain-ra: yes" > "${theConfig}"
 
-    #  set-up zonefile - unbound requires these settings for rpz files
-    set_permissions "${theConfig}"
+        #  set-up zonefile - unbound requires these settings for rpz files
+        set_permissions "${theConfig}"
+    else
+        #   no - trash the config file
+        rm --verbose /etc/unbound/local.d/block.rpz.conf
+    fi
+
 }
 
 #   create an RPZ file for allow or block
@@ -76,7 +91,7 @@ make_rpz_file () {
     local theZonefile="/etc/unbound/zonefiles/${theName}.rpz"  #  output file for RPZ
 
     #  does a list exist?
-    if [[ -s "${theList}" ]] ; then
+    if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
 
         validate_list "${theName}"          #   is the allow/block list valid?
 
@@ -96,15 +111,16 @@ echo "; Name:             ${theName} list
 ;
 ${actionList}" > "${theZonefile}"
 
-    else
-        touch "${theZonefile}"
-        msg_log "info: rpz: the ${theList} is empty."
-    fi
+        #  set-up zonefile - unbound requires these settings for rpz files
+        set_permissions "${theZonefile}"
+        #  set-up allow/block list files
+        set_permissions "${theList}"
 
-    #  set-up zonefile - unbound requires these settings for rpz files
-    set_permissions "${theZonefile}"
-    #  set-up allow/block list files
-    set_permissions "${theList}"
+    else
+        msg_log "info: rpz: the ${theList} is empty."
+
+        rm --verbose "${theZonefile}"   # trash the RPZ file
+    fi
 }
 
 #   check if allow/block list is valid
@@ -112,24 +128,15 @@ validate_list () {
     local theName="${1}"        #   allow or block
     local theList="/var/ipfire/dns/rpz/${theName}list"  #  input custom list of domains
 
-#     bad_lines=$( sed -E \
-#     '/^(([a-z0-9]([a-z0-9-]{0,62}[a-z0-9])*[\.]){1,20}([a-z]{2,61}|xn--[a-z0-9]{1,60}))$/d ;
-#     /^\*\.(([a-zA-Z0-9]{0,62})\.)*[a-zA-Z]{2,63}$/d ;
-#     /^$/d ; /^;/d' "${theList}" )
-
-#	'/^(\*\.){0,1}([a-z0-9][a-z0-9-]{0,62}[a-z0-9]\.){0,20}([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
-#	'/^(\*\.){0,1}([a-z0-9][a-z0-9-]{0,62}[a-z0-9]\.){1,20}([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
-
-
 #   remove good:
 #    - properly formated domain names with or without leading wildcard
 #    - blank lines and comment lines
 #   remaining lines are "bad"
-#	note: may change to non-capturing group with "?:"
+#   note: may change to non-capturing group with "?:"
     bad_lines=$( sed -E \
-	'/^(\*\.){0,1}([a-z0-9][a-z0-9-]{0,62}\.){1,20}([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
-	 /^(\*\.)([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
-     /^$/d ; /^;/d' "${theList}" )
+      '/^(\*\.){0,1}([a-z0-9][a-z0-9-]{0,62}\.){1,20}([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
+       /^(\*\.)([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
+       /^$/d ; /^;/d' "${theList}" )
 
     if [[ ! -z "${bad_lines}" ]] ; then
         msg_log "error: rpz: invalid line(s) in ${theList}."

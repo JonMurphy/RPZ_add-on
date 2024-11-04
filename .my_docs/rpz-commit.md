@@ -1,12 +1,21 @@
 # Change Log
 
+## rpz-beta-0.1.15-15.ipfire on 2024-11-04
+#### rpz.cgi:
+ - feature: added new language file for Turkish (thank you Peppe)
+
+#### rpz-make
+ - bug: corrected empty allow/block list issue.  An empty allow/block list will now remove contents of allow/block.rpz files and remove unneeded allow/block.conf file.  (thank you iptom)
+
 
 ## rpz-beta-0.1.14-14.ipfire on 2024-10-29
 #### rpz-config:
- - bug: `rpz-config list` displayed URL incorrectly (thank you Bernhard)
+ - bug: correct missing rpz extension. `rpz-config list` displayed URL incorrectly (thank you Bernhard)
+
 #### rpz.cgi:
  - bug: remove extra `"` in language files (thank you Bernhard)
  - feature: slightly dim "apply" button when not enabled
+
 
 ## rpz-beta-0.1.13-13.ipfire on 2024-10-27
  - skipped (error in change to config script)

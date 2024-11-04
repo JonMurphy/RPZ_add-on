@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-09-17 - v23"
+version="2024-11-04 - v24"
 
 ###############       Main        ###############
 
@@ -29,19 +29,19 @@ rpzActive="enabled"         #   default "enabled only"
 
 while [[ $# -gt 0 ]] ; do
     case "$1" in
-        --by-names | --by-name )    sortBy="name"   ;;
+        --by-names | --by-name | name )				sortBy="name"   ;;
 
-        --by-hits | --by-hit )      sortBy="hit"    ;;
+        --by-hits | --by-hit | hits | hit )     	sortBy="hit"    ;;
 
-        --by-lines | --by-line )    sortBy="line"   ;;
+        --by-lines | --by-line | lines | line )    	sortBy="line"   ;;
 
-        --by-effect )				sortBy="effect"   ;;
+        --by-effect )								sortBy="effect"   ;;
 
-        --enabled-only )            rpzActive="enabled" ;;
+        --enabled-only )            				rpzActive="enabled" ;;
 
-        --active-all )              rpzActive="all"     ;;
+        --active-all | --all | all )      			rpzActive="all"     ;;
 
-        [0-9] | [0-9][0-9] )        weeks=$1        ;;
+        [0-9] | [0-9][0-9] )        				weeks=$1        ;;
     esac
     shift       # Shift after checking all the cases to get next option
 done
@@ -90,10 +90,10 @@ ucListAuthZones=$( unbound-control list_auth_zones )
 
 #  get width of RPZ names
 pWidth=$( echo "${rpzNames}" | awk '{ print $1"   " }' | wc -L )
-pFormat="%-${pWidth}s %-8s %-8s %-8s %10s %12s\n"
+pFormat="%-${pWidth}s %-8s %-8s %-8s %8s %12s\n"
 
 #  print title line
-printf "${pFormat}" "name" "hits" "active" "lines" "hits/line%" "last update"
+printf "${pFormat}" "name" "hits" "active" " lines" "hits/line" "last update"
 printf -- "--------------"
 
 theResults=""
@@ -101,7 +101,7 @@ totalLines=0
 totalHits=0
 while read -r theName
 do
-    printf -- "-"        #   pretend progress bar
+    printf -- "--"        #   pretend progress bar
 
     #  is this RPZ list active?
     theActive="disabled"
@@ -162,9 +162,9 @@ echo "${theResults}" |
     awk '!/^[[:space:]]*$/' |
     sort "${sortArg[@]}"    |
     awk --assign=width="${pWidth}" \
-        '{ printf "%-*s %-8s %-8s %-8s %10s %12s\n", width, $1, $2, $3, $4, $5, $6 }'
+        '{ printf "%-*s %-8s %-8s %8s %8s %% %12s\n", width, $1, $2, $3, $4, $5, $6 }'
 
 printf "${pFormat}" "" "=======" "" "========" "" ""
-printf "${pFormat}" "Totals -->" "${totalHits}" "" "${totalLines}" "" ""
+printf "${pFormat}" "Totals -->" " ${totalHits}" "" " ${totalLines}" "" ""
 
 exit
