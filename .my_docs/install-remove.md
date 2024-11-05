@@ -19,9 +19,9 @@ scp -P 222 ./packages/rpz-1.0.0-1.ipfire root@ipfire.localdomain:/tmp
 
 ### install on IPFire side
 ```
-fileName=rpz-1.0.0-1.ipfire
-
 ls -l /tmp
+
+fileName=rpz-1.0.0-1.ipfire
 
 cd /opt/pakfire/tmp/
 
@@ -34,4 +34,7 @@ ls -l /opt/pakfire/tmp
 cp -v ROOTFILES /opt/pakfire/db/rootfiles/rpz
 
 NAME=rpz ./install.sh
+#  -or-
+NAME=rpz ./update.sh
+
 ```
