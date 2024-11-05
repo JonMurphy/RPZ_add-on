@@ -19,13 +19,15 @@ scp -P 222 ./packages/rpz-1.0.0-1.ipfire root@ipfire.localdomain:/tmp
 
 ### install on IPFire side
 ```
+fileName=rpz-1.0.0-1.ipfire
+
 ls -l /tmp
 
 cd /opt/pakfire/tmp/
 
-cp -v /tmp/rpz-1.0.0-1.ipfire /opt/pakfire/tmp
+cp -v "/tmp/${fileName}" /opt/pakfire/tmp
 
-tar xvf rpz-1.0.0-1.ipfire
+tar xvf "${fileName}"
 
 ls -l /opt/pakfire/tmp
 
