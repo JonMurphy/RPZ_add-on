@@ -1,5 +1,16 @@
 # Change Log
 
+## rpz-beta-0.1.6-16.ipfire on 2024-11-18
+#### rpz-make
+ - feature: updated validation regex
+ - bug: moved validation to beginning of process.  Now we validate before creating config files.
+
+#### rpz.cgi:
+ - feature: use CSS color variables of the main ipfire theme
+ - bug: empty zonefile remarks were stored as “undef” and caused a warning
+ - bug: HTML textarea removes the first empty line in a custom list
+
+
 ## rpz-beta-0.1.15-15.ipfire on 2024-11-04
 #### rpz.cgi:
  - feature: added new language file for Turkish (thank you Peppe)
@@ -8,7 +19,7 @@
  - bug: corrected empty allow/block list issue.  An empty allow/block list will now remove contents of allow/block.rpz files and remove unneeded allow/block.conf file.  (thank you iptom)
 
 
-## rpz-beta-0.1.14-14.ipfire on 2024-10-29
+## rpz-beta-0.1.14-14.ipfire on  2024-10-29
 #### rpz-config:
  - bug: correct missing rpz extension. `rpz-config list` displayed URL incorrectly (thank you Bernhard)
 
