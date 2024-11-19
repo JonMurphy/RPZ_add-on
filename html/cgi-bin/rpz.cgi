@@ -34,14 +34,14 @@ require "${General::swroot}/header.pl";
 ###--- Extra HTML ---###
 my $extraHead = <<END
 <style>
-	/* alternating row background color */
+	/* alternating row background */
 	.tbl tr:nth-child(2n+2) {
-		background-color: #f0f0f0;
+		background-color: var(--color-light-grey);
 	}
 	.tbl tr:nth-child(2n+3) {
-		background-color: #d6d6d6;
+		background-color: var(--color-grey);
 	}
-	/* text alignment */
+	/* text styles */
 	.tbl th:not(:last-child) {
 		text-align: left;
 	}
@@ -49,6 +49,7 @@ my $extraHead = <<END
 		text-align: right;
 		margin-top: 0.5em;
 	}
+	/* customlist input */
 	textarea.domainlist {
 		margin: 0.5em 0;
 		resize: vertical;
@@ -90,7 +91,7 @@ unless(-f $ZONEFILES_CONF) { &General::safe_system('touch', "$ZONEFILES_CONF"); 
 unless(-f $CUSTOMLISTS_CONF) { &General::safe_system('touch', "$CUSTOMLISTS_CONF"); }
 
 
-## Global gui variables
+## Global gui data
 my $errormessage = "";
 
 ## Global configuration data
@@ -207,7 +208,10 @@ sub _zonefiles_load {
 		# Unique names are already guaranteed by rpz-config
 		if(&_rpz_validate_zonefile($name, $url, '', 0) == 0) {
 			# Populate global data hash, mark all found entries as enabled
-			my %entry = ('enabled' => 'on', 'url' => $url, 'remark' => $Lang::tr{'rpz zf imported'});
+			my %entry = ('enabled' => 'on',
+				'url' => $url,
+				'remark' => $Lang::tr{'rpz zf imported'});
+
 			$zonefiles{$name} = \%entry;
 		}
 	}
@@ -218,6 +222,8 @@ sub _zonefiles_load {
 
 	foreach my $row (values (%configured_files)) {
 		my ($name, $enabled, $url, $remark) = @$row;
+		$remark //= "";
+
 		next unless($name);
 
 		# Check whether this row belongs to an entry already imported from rpz-config
@@ -228,7 +234,10 @@ sub _zonefiles_load {
 			# Skip entry if it is marked as enabled but not found by rpz-config. It was then deleted manually
 			if($enabled ne 'on') {
 				# Populate global data hash
-				my %entry = ('enabled' => 'off', 'url' => $url, 'remark' => $remark);
+				my %entry = ('enabled' => 'off',
+					'url' => $url // "",
+					'remark' => $remark);
+
 				$zonefiles{$name} = \%entry;
 			}
 		}
@@ -505,8 +514,10 @@ sub _print_customlists {
 		<td colspan="2"><b>$Lang::tr{'rpz cl block'}</b><br>$Lang::tr{'rpz cl block info'}</td>
 	</tr>
 	<tr>
-		<td colspan="2"><textarea name="ALLOW_LIST" class="domainlist" cols="45">$cgiparams{'ALLOW_LIST'}</textarea></td>
-		<td colspan="2"><textarea name="BLOCK_LIST" class="domainlist" cols="45">$cgiparams{'BLOCK_LIST'}</textarea></td>
+		<td colspan="2"><textarea name="ALLOW_LIST" class="domainlist" cols="45">
+$cgiparams{'ALLOW_LIST'}</textarea></td>
+		<td colspan="2"><textarea name="BLOCK_LIST" class="domainlist" cols="45">
+$cgiparams{'BLOCK_LIST'}</textarea></td>
 	</tr>
 	<tr>
 		<td><label for="allow_enabled">$Lang::tr{'rpz cl allow enable'}</label></td>
@@ -626,7 +637,10 @@ sub _action_zf_save {
 	}
 
 	# Add to global data hash and save changes
-	my %entry = ('enabled' => $enabled, 'url' => $url, 'remark' => $remark);
+	my %entry = ('enabled' => $enabled,
+		'url' => $url,
+		'remark' => $remark);
+
 	$zonefiles{$name} = \%entry;
 	&_zonefiles_save_conf();
 
@@ -793,10 +807,6 @@ sub _rpz_validate_customlist {
 # (Must be sent before calling &Header::showhttpheaders())
 sub _http_prg_redirect {
 	my $location = "https://$ENV{'SERVER_NAME'}:$ENV{'SERVER_PORT'}$ENV{'SCRIPT_NAME'}";
-	print "Status: 303 See Other\n";
-	print "Location: $location\n";
-}
-NV{'SCRIPT_NAME'}";
 	print "Status: 303 See Other\n";
 	print "Location: $location\n";
 }
