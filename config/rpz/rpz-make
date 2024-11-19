@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-11-03 - v09"
+version="2024-11-18 - v10"
 
 ###############     Functions     ###############
 
@@ -78,7 +78,6 @@ echo "rpz:
         #   no - trash the config file
         rm --verbose /etc/unbound/local.d/block.rpz.conf
     fi
-
 }
 
 #   create an RPZ file for allow or block
@@ -93,7 +92,7 @@ make_rpz_file () {
     #  does a list exist?
     if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
 
-        validate_list "${theName}"          #   is the allow/block list valid?
+#        validate_list "${theName}"          #   is the allow/block list valid?
 
         # for allow set to passthru
         [[ "${theName}" == allow ]] && theAction='rpz-passthru.'
@@ -132,11 +131,11 @@ validate_list () {
 #    - properly formated domain names with or without leading wildcard
 #    - blank lines and comment lines
 #   remaining lines are "bad"
-#   note: may change to non-capturing group with "?:"
-    bad_lines=$( sed -E \
-      '/^(\*\.){0,1}([a-z0-9][a-z0-9-]{0,62}\.){1,20}([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
-       /^(\*\.)([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
-       /^$/d ; /^;/d' "${theList}" )
+
+    bad_lines=$( sed --regexp-extended  \
+        '/^([a-zA-Z0-9](([a-zA-Z0-9\-]){0,61}[a-zA-Z0-9])?\.)+([a-zA-Z]{2,}|xn--[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$/d ;
+        /^(\*\.)([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
+        /^$/d ; /^;/d' "${theList}" )
 
     if [[ ! -z "${bad_lines}" ]] ; then
         msg_log "error: rpz: invalid line(s) in ${theList}."
@@ -168,16 +167,19 @@ case "${rpzName}" in
 
     #  make a new allow or block rpz file
     allow )
+		validate_list 'allow'           #   is the allowlist valid?
         make_allow_config "${rpzLog}"
         make_rpz_file 'allow'
         ;;
 
     allowblock )
+		validate_list 'allow'           #   is the list valid?
         make_allow_config "${rpzLog}"
         make_rpz_file 'allow'
         ;&
 
     block )
+		validate_list 'block'           #   is the blocklist valid?
         make_block_config "${rpzLog}"
         make_rpz_file 'block'
         ;;

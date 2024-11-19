@@ -796,3 +796,7 @@ sub _http_prg_redirect {
 	print "Status: 303 See Other\n";
 	print "Location: $location\n";
 }
+NV{'SCRIPT_NAME'}";
+	print "Status: 303 See Other\n";
+	print "Location: $location\n";
+}
