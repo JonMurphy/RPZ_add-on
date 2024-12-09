@@ -1,6 +1,11 @@
 # Change Log
 
-## rpz-beta-0.1.6-16.ipfire on 2024-11-18
+## rpz-beta-0.1.17-17.ipfire on 2024-12-09
+#### rpz-make
+ - bug: corrected validation regex for wildcards like: `*.domain.com`
+
+
+## rpz-beta-0.1.16-16.ipfire on 2024-11-18
 #### rpz-make
  - feature: updated validation regex
  - bug: moved validation to beginning of process.  Now we validate before creating config files.
