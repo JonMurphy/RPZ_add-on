@@ -9,6 +9,7 @@
  - feature: use CSS color variables of the main ipfire theme
  - bug: empty zonefile remarks were stored as “undef” and caused a warning
  - bug: HTML textarea removes the first empty line in a custom list
+ - thank you Leo!
 
 
 ## rpz-beta-0.1.15-15.ipfire on 2024-11-04
@@ -56,7 +57,7 @@
 
 ## rpz-beta-0.1.9-9.ipfire on 2024-10-08
 #### rpz.cgi:
- - feature: added new language file for German (thank you Leo
+ - feature: added new language file for German (thank you Leo)
  - bug: add missing "rpz exitcode 110"
  - bug: corrected missing RPZ menu item at menu > IPFire
 

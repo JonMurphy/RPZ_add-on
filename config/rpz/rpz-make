@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-11-18 - v10"
+version="2024-12-02 - v11"
 
 ###############     Functions     ###############
 
@@ -27,9 +27,9 @@ source /usr/sbin/rpz-functions
 
 #   create the config file for allow
 make_allow_config () {
-    local theLog="${1:-yes}"
-    local theConfig="/etc/unbound/local.d/00-rpz.conf"    #  output zone conf file
-    local theList="/var/ipfire/dns/rpz/allowlist"         #  input custom list of domains
+    local theLog="${1:-yes}"                            #  log default ON
+    local theConfig="/etc/unbound/local.d/00-rpz.conf"  #  output zone conf file
+    local theList="/var/ipfire/dns/rpz/allowlist"       #  input custom list of domains
 
     msg_log "info: rpz: make config file \"00-rpz.conf\""
 
@@ -55,7 +55,7 @@ echo "rpz:
 
 #   create the config file for block
 make_block_config () {
-    local theLog="${1:-yes}"
+    local theLog="${1:-yes}"                                #  log default ON
     local theConfig="/etc/unbound/local.d/block.rpz.conf"   #  output zone conf file
     local theList="/var/ipfire/dns/rpz/blocklist"           #  input custom list of domains
 
@@ -92,8 +92,6 @@ make_rpz_file () {
     #  does a list exist?
     if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
 
-#        validate_list "${theName}"          #   is the allow/block list valid?
-
         # for allow set to passthru
         [[ "${theName}" == allow ]] && theAction='rpz-passthru.'
 
@@ -127,19 +125,18 @@ validate_list () {
     local theName="${1}"        #   allow or block
     local theList="/var/ipfire/dns/rpz/${theName}list"  #  input custom list of domains
 
-#   remove good:
-#    - properly formated domain names with or without leading wildcard
-#    - blank lines and comment lines
-#   remaining lines are "bad"
-
+	#   remove good:
+	#    - properly formated domain names with or without leading wildcard
+	#    - properly formated top level domain (TLD) names with wildcard
+	#    - blank lines and comment lines
+	#   remaining lines are considered "bad"
     bad_lines=$( sed --regexp-extended  \
-        '/^([a-zA-Z0-9](([a-zA-Z0-9\-]){0,61}[a-zA-Z0-9])?\.)+([a-zA-Z]{2,}|xn--[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$/d ;
-        /^(\*\.)([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
-        /^$/d ; /^;/d' "${theList}" )
+        '/^(\*\.)?([a-zA-Z0-9](([a-zA-Z0-9\-]){0,61}[a-zA-Z0-9])?\.)+([a-zA-Z]{2,}|xn--[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$/d ;
+         /^(\*\.)([a-z]{2,61}|xn--[a-z0-9]{1,60})$/d ;
+         /^$/d ; /^;/d' "${theList}" )
 
     if [[ ! -z "${bad_lines}" ]] ; then
         msg_log "error: rpz: invalid line(s) in ${theList}."
-        #bad_lines=$( echo "${bad_lines}" | tr -s '\r\n' ' ' )
         printf "%s\n" "bad line(s): ${bad_lines}"
         exit 110
     fi
@@ -164,22 +161,22 @@ while [[ $# -gt 0 ]] ; do
 done
 
 case "${rpzName}" in
-
     #  make a new allow or block rpz file
+
     allow )
-		validate_list 'allow'           #   is the allowlist valid?
+        validate_list 'allow'           #   is the allowlist valid?
         make_allow_config "${rpzLog}"
         make_rpz_file 'allow'
         ;;
 
     allowblock )
-		validate_list 'allow'           #   is the list valid?
+        validate_list 'allow'           #   is the list valid?
         make_allow_config "${rpzLog}"
         make_rpz_file 'allow'
         ;&
 
     block )
-		validate_list 'block'           #   is the blocklist valid?
+        validate_list 'block'           #   is the blocklist valid?
         make_block_config "${rpzLog}"
         make_rpz_file 'block'
         ;;
