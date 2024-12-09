@@ -112,7 +112,6 @@ ${actionList}" > "${theZonefile}"
         set_permissions "${theZonefile}"
         #  set-up allow/block list files
         set_permissions "${theList}"
-
     else
         msg_log "info: rpz: the ${theList} is empty."
 
