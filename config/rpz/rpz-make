@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-12-02 - v11"
+version="2024-12-10 - v12"
 
 ###############     Functions     ###############
 
@@ -182,6 +182,12 @@ case "${rpzName}" in
 
     reload )
         check_unbound_conf "${checkConf}"
+        ;;
+
+    unbound-restart )
+        check_unbound_conf "${checkConf}"
+		unbound_restart
+		exit
         ;;
 
     * )

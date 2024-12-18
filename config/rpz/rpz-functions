@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-#	version="2024-09-01   v01"
+#   version="2024-12-10 - v02"
 
 ###############     Functions     ###############
 
@@ -34,8 +34,8 @@ msg_log () {
 check_name () {
     local theName="${1}"
 
-    regex='^[a-zA-Z0-9_]+$'				# no dash or plus, alpha numeric only
-    regex1='^(allow|block)$'			# allow and block are reserved NAMEs
+    regex='^[a-zA-Z0-9_]+$'             # no dash or plus, alpha numeric only
+    regex1='^(allow|block)$'            # allow and block are reserved NAMEs
     if [[ ! "${theName}" =~ $regex ]] || [[ "${theName}" =~ $regex1 ]] ; then
         msg_log "error: rpz: the NAME is not valid: \"${theName}\". exit."
         exit 101
@@ -43,28 +43,28 @@ check_name () {
 }
 
 set_permissions () {
- 	chown nobody:nobody "$@"
- 	chmod 644 "$@"
+    chown nobody:nobody "$@"
+    chmod 644 "$@"
 }
 
 check_unbound_conf () {
-	local thecheckConf="${1:-yes}"		#	check config default is yes
+    local thecheckConf="${1:-yes}"      #   check config default is yes
 
     #  check the above config files
     if [[ "${thecheckConf}" == yes ]] ; then
-		msg_log "info: rpz: check for errors with \"unbound-checkconf\""
+        msg_log "info: rpz: check for errors with \"unbound-checkconf\""
 
-		if ! unbound-checkconf ; then
-			msg_log "error: rpz: unbound-checkconf found invalid configuration."
-			msg_log \
-			  "error: rpz: In Terminal run the command \"unbound-checkconf\" for more information. exit."
-			exit 102
-		fi
+        if ! unbound-checkconf ; then
+            msg_log "error: rpz: unbound-checkconf found invalid configuration."
+            msg_log \
+              "error: rpz: In Terminal run the command \"unbound-checkconf\" for more information. exit."
+            exit 102
+        fi
     fi
 }
 
 unbound_control_reload () {
-	local theReload="${1:-yes}"		#	reload default is yes
+    local theReload="${1:-yes}"     #   reload default is yes
 
     if [[ "${theReload}" == yes ]] ; then
         #  reload due to the changes
@@ -75,4 +75,11 @@ unbound_control_reload () {
             exit 109
         fi
     fi
+}
+
+unbound_restart () {
+    #  restart due to the changes
+    msg_log  "info: rpz: run \"unbound restart\""
+
+    /usr/local/bin/unboundctrl restart
 }
