@@ -1,5 +1,0 @@
-#  add to `/home/jon/development6/ipfire-2.x/config/rootfiles/common/configroot`
-#    added alphabetically in this list
-#    must include leading `#`
-
-#var/ipfire/menu.d/EX-rpz.menu
