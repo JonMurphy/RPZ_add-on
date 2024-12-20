@@ -1,6 +1,0 @@
-#  add this line to `manualpages` file at `ipfire-2.x/config/cfgroot/manualpages`
-#	under the "IPfire menu" section
-#
-#	IPfire menu
-#
-rpz.cgi=addons/rpz
