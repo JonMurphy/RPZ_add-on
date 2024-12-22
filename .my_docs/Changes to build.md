@@ -89,3 +89,15 @@ rpzctrl
 ```
 ![Screenshot 2024-12-19 at 7 28 09 PM_thumb](https://github.com/user-attachments/assets/82d739a2-601f-4630-a88b-95bf6da6df51)
 
+
+#### 7. add to rootfiles
+ - edit `./config/rootfiles/common/misc-progs` and add
+
+```
+#usr/local/bin/rpzctrl
+```
+ - must include leading `#`
+     - maybe because this is an add-on? 
+ - added alphabetically in rootfiles list
+
+![Screenshot 2024-12-21 at 10 04 32 PM_thumb](https://github.com/user-attachments/assets/61b1021d-7494-44d2-a972-b06186822d84)
