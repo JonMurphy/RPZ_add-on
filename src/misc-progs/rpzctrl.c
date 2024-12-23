@@ -24,19 +24,19 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (strcmp(argv[1], "list") == 0) {
-		system_output('/usr/sbin/rpz-config', 'list');
+		safe_system("/usr/sbin/rpz-config list");
 
 	} else if (strcmp(argv[1], "reload") == 0) {
-		safe_system('/usr/sbin/rpz-config', 'reload');
+		safe_system("/usr/sbin/rpz-config reload");
 
 	} else if (strcmp(argv[1], "allowblock") == 0) {
-		safe_system('/usr/sbin/rpz-make', 'allowblock', '--no-reload');
+		safe_system("/usr/sbin/rpz-make allowblock --no-reload");
 
 	} else if (strcmp(argv[1], "add") == 0) {
-		safe_system('/usr/sbin/rpz-config', 'add', strcmp(argv[2], '--no-reload');
+		return run("/usr/sbin/rpz-config --no-reload add", argv + 2);
 
 	} else if (strcmp(argv[1], "remove") == 0) {
-		safe_system('/usr/sbin/rpz-config', 'remove', strcmp(argv[2], '--no-reload');
+		return run("/usr/sbin/rpz-config --no-reload remove", argv + 2);
 
 	} else {
 		fprintf(stderr, "\nBad argument given.\n\nrpzctrl list|reload|allowblock|add NAME|remove NAME\n\n");
