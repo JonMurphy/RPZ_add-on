@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 #  IPFire.org - A linux based firewall                                        #
-#  Copyright (C) 2024  IPFire Team  <info@ipfire.org>                         #
+#  Copyright (C) 2024-2025  IPFire Team  <info@ipfire.org>                    #
 #                                                                             #
 #  This program is free software: you can redistribute it and/or modify       #
 #  it under the terms of the GNU General Public License as published by       #
@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-12-17 - v42"
+version="2025-01-11 - v44"
 
 ###############     Functions     ###############
 
@@ -39,14 +39,14 @@ rpzConfig="/etc/unbound/local.d/${rpzName}.rpz.conf"    #  output zone conf file
 rpzFile="/etc/unbound/zonefiles/${rpzName}.rpz"         #  output for RPZ file
 
 rpzLog="yes"                        #  log default is yes
-ucReload="yes"						#  reload default is yes
+ucReload="yes"                      #  reload default is yes
 
 while [[ $# -gt 0 ]] ; do
     case "$1" in
-        --no-log )		rpzLog="no"   ;;
-        --no-reload )	ucReload="no" ; checkConf="no" ;;
+        --no-log )      rpzLog="no"   ;;
+        --no-reload )   ucReload="no" ; checkConf="no" ;;
     esac
-    shift		# Shift after checking all the cases to get next option
+    shift       # Shift after checking all the cases to get next option
 done
 
 case "${rpzAction}" in
@@ -66,35 +66,25 @@ case "${rpzAction}" in
             exit 105
         fi
 
-#         #  create the zone config file
-# echo "rpz:
-#     name:                   ${rpzName}.rpz
-#     zonefile:               ${rpzFile}
-#     url:                    ${rpzURL}
-#     rpz-action-override:    nxdomain
-#     rpz-log:                ${rpzLog}
-#     rpz-log-name:           ${rpzName}
-#     rpz-signal-nxdomain-ra: yes" > "${rpzConfig}"
-
         #  create the zone config file
-		{
-		echo "rpz:"
-		echo "    name:                   ${rpzName}.rpz"
-		echo "    zonefile:               ${rpzFile}"
-		echo "    url:                    ${rpzURL}"
-		echo "    rpz-action-override:    nxdomain"
-		echo "    rpz-log:                ${rpzLog}"
-		echo "    rpz-log-name:           ${rpzName}"
-		echo "    rpz-signal-nxdomain-ra: yes"
-		} > "${rpzConfig}"
+        {
+        echo "rpz:"
+        echo "    name:                   ${rpzName}.rpz"
+        echo "    zonefile:               ${rpzFile}"
+        echo "    url:                    ${rpzURL}"
+        echo "    rpz-action-override:    nxdomain"
+        echo "    rpz-log:                ${rpzLog}"
+        echo "    rpz-log-name:           ${rpzName}"
+        echo "    rpz-signal-nxdomain-ra: yes"
+        } > "${rpzConfig}"
 
-		#  set-up zonefile
-		#    create an empty rpz file if it does not exist
-		if [[ ! -f "${rpzFile}" ]] ; then
-			touch "${rpzFile}"
-			#  unbound requires these settings for rpz files
- 			set_permissions "${rpzFile}" "${rpzConfig}"
-		fi
+        #  set-up zonefile
+        #    create an empty rpz file if it does not exist
+        if [[ ! -f "${rpzFile}" ]] ; then
+            touch "${rpzFile}"
+            #  unbound requires these settings for rpz files
+            set_permissions "${rpzFile}" "${rpzConfig}"
+        fi
         ;;
 
     #  trash config file & rpz file
@@ -109,22 +99,21 @@ case "${rpzAction}" in
         rm "${rpzFile}"
         ;;
 
-	reload )
-		check_unbound_conf "${checkConf}"
-		;;
+    reload )
+        check_unbound_conf "${checkConf}"
+        ;;
 
     list )
-		awk -F':' '/^\s*name:/{ gsub(/[[:blank:]]|\.rpz/, "",$2) ; NAME=$2 } \
-			/^\s*url:/{ gsub(/[[:blank:]]/, "") ; print NAME"="$2":"$3} '  \
-			/etc/unbound/local.d/*rpz.conf
-
-		exit
+        awk -F':' '/^\s*name:/{ gsub(/[[:blank:]]|\.rpz/, "",$2) ; NAME=$2 } \
+            /^\s*url:/{ gsub(/[[:blank:]]/, "") ; print NAME"="$2":"$3} '  \
+            /etc/unbound/local.d/*rpz.conf
+        exit
         ;;
 
     unbound-restart )
         check_unbound_conf "${checkConf}"
-		unbound_restart
-		exit
+        unbound_restart
+        exit
         ;;
 
     * )

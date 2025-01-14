@@ -13,33 +13,47 @@
 #include <fcntl.h>
 #include "setuid.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char** argv) {
+
+	char theVersion[] = "2025-01-17 - v08";
 
 	if (!(initsetuid()))
 		exit(1);
 
-	if (argc < 2) {
-		fprintf(stderr, "\nNo argument given.\n\nrpzctrl list|reload|allowblock|add NAME|remove NAME\n\n");
+ 	if (argc < 2 || argc > 5) {
+		fprintf(stderr, "\nNo argument given.\n");
+		fprintf(stderr, "\nrpzctrl list|reload|allowblock|add NAME URL|remove NAME\n");
+		fprintf(stderr, "%s\n\n", theVersion);
 		exit(1);
 	}
 
-	if (strcmp(argv[1], "list") == 0) {
+    // Do not need name of this program
+    // "Shift left" by incrementing argv pointer
+    argc--;
+    argv++;
+
+	if (strcmp(argv[0], "list") == 0) {
 		safe_system("/usr/sbin/rpz-config list");
 
-	} else if (strcmp(argv[1], "reload") == 0) {
+	} else if (strcmp(argv[0], "reload") == 0) {
 		safe_system("/usr/sbin/rpz-config reload");
 
-	} else if (strcmp(argv[1], "allowblock") == 0) {
-		safe_system("/usr/sbin/rpz-make allowblock --no-reload");
+	} else if (strcmp(argv[0], "restart") == 0) {
+		safe_system("/usr/sbin/rpz-config unbound-restart");
 
-	} else if (strcmp(argv[1], "add") == 0) {
-		return run("/usr/sbin/rpz-config --no-reload add", argv + 2);
+	} else if (strcmp(argv[0], "allowblock") == 0) {
+		safe_system("/usr/sbin/rpz-make allowblock");
 
-	} else if (strcmp(argv[1], "remove") == 0) {
-		return run("/usr/sbin/rpz-config --no-reload remove", argv + 2);
+	} else if (strcmp(argv[0], "add") == 0) {
+		return run("/usr/sbin/rpz-config", argv);
+
+	} else if (strcmp(argv[0], "remove") == 0) {
+		return run("/usr/sbin/rpz-config", argv);
 
 	} else {
-		fprintf(stderr, "\nBad argument given.\n\nrpzctrl list|reload|allowblock|add NAME|remove NAME\n\n");
+		fprintf(stderr, "\nBad argument given.\n");
+		fprintf(stderr, "\nrpzctrl list|reload|allowblock|add NAME URL|remove NAME\n");
+		fprintf(stderr, "%s\n\n", theVersion);
 		exit(1);
 	}
 

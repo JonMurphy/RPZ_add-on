@@ -87,8 +87,8 @@ my $RPZ_BLOCKLIST = "${General::swroot}/dns/rpz/blocklist";
 ### Preparation ###
 
 # Create missing config files
-unless(-f $ZONEFILES_CONF) { &General::safe_system('touch', "$ZONEFILES_CONF"); }
-unless(-f $CUSTOMLISTS_CONF) { &General::safe_system('touch', "$CUSTOMLISTS_CONF"); }
+unless(-f $ZONEFILES_CONF) { &General::system('touch', "$ZONEFILES_CONF"); }
+unless(-f $CUSTOMLISTS_CONF) { &General::system('touch', "$CUSTOMLISTS_CONF"); }
 
 
 ## Global gui data
@@ -145,8 +145,14 @@ if($action eq 'ZF_SAVE') {				## Save new or modified zonefiles entry
 		&_http_prg_redirect();
 	}
 
-} elsif($action eq 'RPZ_RELOAD') {		## Reload dns service
+} elsif($action eq 'RPZ_RELOAD') {		## Reload dns configuration
 	if(&_action_rpz_reload()) {
+		$action = 'NONE';
+		&_http_prg_redirect();
+	}
+
+} elsif($action eq 'UNB_RESTART') {		## Restart unbound service
+	if(&_action_unb_restart()) {
 		$action = 'NONE';
 		&_http_prg_redirect();
 	}
@@ -181,6 +187,7 @@ if($action eq "ZF_EDIT") {
 # Show gui elements
 &_print_zonefiles();
 &_print_customlists();
+&_print_gui_extras();
 
 &Header::closebigbox();
 &Header::closepage();
@@ -195,7 +202,7 @@ sub _zonefiles_load {
 	# Clean start
 	%zonefiles = ();
 
-	# Source 1: Get the currently enabled zonefiles from rpz-config (expected format [URL]=[remark])
+	# Source 1: Get the currently enabled zonefiles from rpz-config (expected format [name]=[URL])
 	my @enabled_files = &General::system_output('/usr/sbin/rpz-config', 'list');
 
 	foreach my $row (@enabled_files) {
@@ -416,7 +423,7 @@ END
 	<form method="post" action="$ENV{'SCRIPT_NAME'}">
 		<input type="hidden" name="KEY" value="">
 		<button type="submit" name="ACTION" value="ZF_EDIT">$Lang::tr{'add'}</button>
-		<button type="submit" name="ACTION" value="RPZ_RELOAD"$reload_state>$Lang::tr{'rpz apply'}</button>
+		<button type="submit" name="ACTION" value="RPZ_RELOAD" class="commit"$reload_state>$Lang::tr{'rpz apply'}</button>
 	</form>
 </div>
 END
@@ -531,7 +538,7 @@ $cgiparams{'BLOCK_LIST'}</textarea></td>
 	<tr>
 		<td align="right" colspan="4">
 			<button type="submit" name="ACTION" value="CL_SAVE">$Lang::tr{'save'}</button>
-			<button type="submit" name="ACTION" value="RPZ_RELOAD"$reload_state>$Lang::tr{'rpz apply'}</button>
+			<button type="submit" name="ACTION" value="RPZ_RELOAD" class="commit"$reload_state>$Lang::tr{'rpz apply'}</button>
 		</td>
 </table>
 </form>
@@ -539,6 +546,95 @@ END
 ;
 
 	&Header::closebox();
+}
+
+# Output javascript and extra gui elements
+sub _print_gui_extras {
+
+	# Apply/Restart button modifier key handler
+	if(&_rpz_needs_reload()) {
+		print <<END
+<script>
+	// Commit modifier key handler
+	(function(jq, document) {
+		var keyEventsOn = false;	// Keyboard events attached
+		var keyModify = false;		// Modifier key pressed
+		var mouseHover = false;		// Mouse over commit button
+		var btnModified = false;	// Button modified to "Restart"
+
+		// Document-level key events, enable only while cursor is over button
+		function attachKeyEvents() {
+			if(keyEventsOn) {
+				return;
+			}
+			keyEventsOn = true;
+
+			jq(document).on("keydown.rpz", function(event) {
+				if((!keyModify) && event.shiftKey) {
+					keyModify = true;
+					handleModify();
+				}
+			});
+			jq(document).on("keyup.rpz", function(event) {
+				if(keyModify && (!event.shiftKey)) {
+					keyModify = false;
+					handleModify();
+				}
+			});
+		}
+		function removeKeyEvents() {
+			keyModify = false;
+			if(keyEventsOn) {
+				jq(document).off("keydown.rpz keyup.rpz");
+				keyEventsOn = false;
+			}
+		}
+
+		// Attach mouse hover events to commit buttons
+		function attachMouseEvents() {
+			jq("button.commit").on("mouseenter", function(event) {
+				if(!mouseHover) {
+					mouseHover = true;
+					attachKeyEvents();
+					// Handle already pressed key
+					keyModify = !!(event.shiftKey);
+					handleModify();
+				}
+			});
+
+			// Cursor moved away: Disable key listener to minimize events
+			jq("button.commit").on("mouseleave", function() {
+				if(mouseHover) {
+					mouseHover = false;
+					removeKeyEvents();
+					handleModify();
+				}
+			});
+		}
+
+		// Modify commit button
+		function handleModify() {
+			let modify = mouseHover && keyModify;
+			if(btnModified != modify) {
+				if(modify) {
+					jq("button.commit").text("$Lang::tr{'restart'}").val("UNB_RESTART");
+				} else {
+					jq("button.commit").text("$Lang::tr{'rpz apply'}").val("RPZ_RELOAD");
+				}
+				btnModified = modify;
+			}
+		}
+
+		// jQuery DOM ready
+		jq(function() {
+			attachMouseEvents();
+		});
+	})(jQuery, document);
+</script>
+END
+;
+	} # End of modifier key handler
+
 }
 
 
@@ -697,9 +793,24 @@ sub _action_rpz_reload {
 	# Perform reload, recreate reload flag on error to enable retry
 	my $result = &General::system('/usr/sbin/rpz-config', 'reload');
 	if(not &_rpz_check_result($result, 0)) {
-		&General::safe_system('touch', "$RPZ_RELOAD_FLAG");
+		&General::system('touch', "$RPZ_RELOAD_FLAG");
 		return;
 	}
+
+	return 1;
+}
+
+# Trigger unbound restart
+sub _action_unb_restart {
+	return 1 unless &_rpz_needs_reload();
+
+	# Immediately clear flag to prevent multiple restarts
+	if(-f $RPZ_RELOAD_FLAG) {
+		unlink($RPZ_RELOAD_FLAG) or die "Can't remove $RPZ_RELOAD_FLAG: $!";
+	}
+
+	# Perform restart, unboundctrl always exits zero
+	&General::system('/usr/local/bin/unboundctrl', 'restart');
 
 	return 1;
 }
@@ -736,7 +847,7 @@ sub _rpz_check_result {
 
 	# Set reload flag
 	if($request_reload) {
-		&General::safe_system('touch', "$RPZ_RELOAD_FLAG");
+		&General::system('touch', "$RPZ_RELOAD_FLAG");
 	}
 
 	return 1;

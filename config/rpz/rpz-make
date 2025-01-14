@@ -2,7 +2,7 @@
 ###############################################################################
 #                                                                             #
 #  IPFire.org - A linux based firewall                                        #
-#  Copyright (C) 2024  IPFire Team  <info@ipfire.org>                         #
+#  Copyright (C) 2024-2025  IPFire Team  <info@ipfire.org>                    #
 #                                                                             #
 #  This program is free software: you can redistribute it and/or modify       #
 #  it under the terms of the GNU General Public License as published by       #
@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-12-10 - v12"
+version="2025-01-11 - v14"
 
 ###############     Functions     ###############
 
@@ -33,13 +33,13 @@ make_allow_config () {
 
     msg_log "info: rpz: make config file \"00-rpz.conf\""
 
-echo "server:
+    echo "server:
     module-config: \"respip validator iterator\"" > "${theConfig}"
 
     #  does allow list exist?
     if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
 
-echo "rpz:
+    echo "rpz:
     name:                   allow.rpz
     zonefile:               /etc/unbound/zonefiles/allow.rpz
     rpz-action-override:    passthru
@@ -64,7 +64,7 @@ make_block_config () {
     #  does block list exist?
     if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
 
-echo "rpz:
+    echo "rpz:
     name:                   block.rpz
     zonefile:               /etc/unbound/zonefiles/block.rpz
     rpz-action-override:    nxdomain
