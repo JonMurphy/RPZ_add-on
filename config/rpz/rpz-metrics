@@ -19,7 +19,7 @@
 #                                                                             #
 ###############################################################################
 
-version="2024-11-04 - v24"
+version="2025-01-20 - v25"
 
 ###############       Main        ###############
 
@@ -90,10 +90,10 @@ ucListAuthZones=$( unbound-control list_auth_zones )
 
 #  get width of RPZ names
 pWidth=$( echo "${rpzNames}" | awk '{ print $1"   " }' | wc -L )
-pFormat="%-${pWidth}s %-8s %-8s %-8s %8s %12s\n"
+pFormat="%-${pWidth}s %-8s %-8s %8s %12s %12s\n"
 
 #  print title line
-printf "${pFormat}" "name" "hits" "active" " lines" "hits/line" "last update"
+printf "${pFormat}" "name" "hits" "active" "lines" " hits/line" "last download"
 printf -- "--------------"
 
 theResults=""
@@ -162,9 +162,9 @@ echo "${theResults}" |
     awk '!/^[[:space:]]*$/' |
     sort "${sortArg[@]}"    |
     awk --assign=width="${pWidth}" \
-        '{ printf "%-*s %-8s %-8s %8s %8s %% %12s\n", width, $1, $2, $3, $4, $5, $6 }'
+        '{ printf "%-*s %-8s %-8s %8s %10s %% %12s\n", width, $1, $2, $3, $4, $5, $6 }'
 
 printf "${pFormat}" "" "=======" "" "========" "" ""
-printf "${pFormat}" "Totals -->" " ${totalHits}" "" " ${totalLines}" "" ""
+printf "${pFormat}" "Totals -->" "${totalHits}" "" "${totalLines}" "" ""
 
 exit
