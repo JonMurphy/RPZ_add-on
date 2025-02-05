@@ -36,7 +36,7 @@ lfsmake2 rpz
 #### 3.  add WebGUI page
  - Edit `./config/rootfiles/common/web-user-interface`
  - must include leading `#`
-     - maybe because this is an add-on? 
+     - maybe because this is an add-on?
 ```
 #srv/web/ipfire/cgi-bin/rpz.cgi
 ```
@@ -55,6 +55,11 @@ rpz.cgi=addons/rpz
 
 
 #### 5. add new rootfiles lines for correct build
+
+ - Create an `rpz` file:
+ ```
+ touch ./config/rootfiles/packages/rpz
+ ```
  - Edit `./config/rootfiles/packages/rpz`
 
 ```
@@ -97,7 +102,7 @@ rpzctrl
 #usr/local/bin/rpzctrl
 ```
  - must include leading `#`
-     - maybe because this is an add-on? 
+     - maybe because this is an add-on?
  - added alphabetically in rootfiles list
 
 ![Screenshot 2024-12-21 at 10 04 32 PM_thumb](https://github.com/user-attachments/assets/61b1021d-7494-44d2-a972-b06186822d84)
