@@ -60,13 +60,12 @@ rpz.cgi=addons/rpz
  ```
  touch ./config/rootfiles/packages/rpz
  ```
- - Edit `./config/rootfiles/packages/rpz`
+ - Edit `./config/rootfiles/packages/rpz` and add these lines:
 
 ```
 etc/unbound/local.d/00-rpz.conf
 etc/unbound/zonefiles
 etc/unbound/zonefiles/allow.rpz
-usr/local/bin/rpzctrl
 usr/sbin/rpz-config
 usr/sbin/rpz-functions
 usr/sbin/rpz-make
