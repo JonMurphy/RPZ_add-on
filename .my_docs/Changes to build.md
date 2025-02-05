@@ -85,6 +85,7 @@ var/ipfire/menu.d/EX-rpz.menu
 srv/web/ipfire/cgi-bin/rpz.cgi
 ```
 
+<strike>
 #### 6. Add rpzctrl
  - edit `./src/misc-progs/Makefile` and add:
 
@@ -92,7 +93,7 @@ srv/web/ipfire/cgi-bin/rpz.cgi
 rpzctrl
 ```
 ![Screenshot 2024-12-19 at 7 28 09 PM_thumb](https://github.com/user-attachments/assets/82d739a2-601f-4630-a88b-95bf6da6df51)
-
+</strike>
 
 #### 7. add to rootfiles
  - edit `./config/rootfiles/common/misc-progs` and add
