@@ -1,16 +1,17 @@
 # Change Log
 
 
-## rpz-beta-0.1.18-18.ipfire on 2025-01-15
-
-#### rpz-config and rpz-make:
- - new feature: added action for unbound restart `rpz-config unbound-restart`
+## rpz-beta-0.1.18-18.ipfire on 2025-02-01
 
 #### rpz.cgi:
  - new feature: added a mod key to force a unbound restart
 
-#### rpzctrl
- - new program: to add a layer of protection between WebGUI and OS
+#### rpz-config and rpz-make:
+ - new feature: added action for unbound restart `rpz-config unbound-restart`
+
+#### rpz-metrics
+ - simple reformatting
+ - rename far right column from "last update" to "last download"
 
 
 ## rpz-beta-0.1.17-17.ipfire on 2024-12-09
