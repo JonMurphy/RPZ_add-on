@@ -46,10 +46,10 @@ NAME=rpz ./install.sh
 ## Usage via WebGUI
 The RPZ WebGUI is here thanks to Leo Hofmann!
 
-To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**.  
+To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**:
 
 <p align="center">
-  <img width="600" alt="rpz_webgui" src="https://github.com/JonMurphy/RPZ/blob/b26ac4d42c2d33ae80ff3cc84c25f737e9ce1d8b/docs/images/rpz_webgui.png" />
+  <img width="800" alt="rpz_webgui_menu" src="https://github.com/JonMurphy/RPZ/blob/7ae01fea833fc02d6e7d563f2e54eb881b973cff/docs/images/rpz_webgui_menu.png" />
 </p>
 
 ## Zonefiles section
