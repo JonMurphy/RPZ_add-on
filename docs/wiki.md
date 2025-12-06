@@ -48,9 +48,7 @@ The RPZ WebGUI is here thanks to Leo Hofmann!
 
 To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**.  
 
-![](./rpz_webgui2.png "example of WebGUI"")
-![](./docs/images/rpz_webgui.png)
-
+<img width="700" alt="rpz_webgui" src="https://github.com/user-attachments/assets/70a1f371-411f-4f76-b8e3-2b2fde8b672c" />
 
 ## Zonefiles section
 List of the Names, URLs, and a short Remark for each zonefile item.  There are 10 items maximum.  Too many lists will slow down Unbound and DNS.
