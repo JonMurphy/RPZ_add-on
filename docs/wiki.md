@@ -1,36 +1,37 @@
 # Response Policy Zones (RPZ)
 
-*** DRAFT *** work in progress *** DRAFT *** work in progress *** DRAFT *** work in progress *** DRAFT *** work in progress *** DRAFT *** 
+*** DRAFT *** work in progress *** DRAFT *** work in progress *** DRAFT *****
 
-Response Policy Zone (RPZ) is a mechanism that makes it possible to define local policies in a standardized way and load policies from external sources.  [^1]
+The Response Policy Zone (RPZ) is a mechanism that enables the definition of local policies in a standardized manner and facilitates the loading of policies from external sources. [^1]
 
-The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics.  (there are no plans to add the pretty graphics).
+The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics (there are no plans to add the pretty graphics).
 
 **Note**: Domains blocked by RPZ are not DROPped or REJECTed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
 
 
 ## Installation
 
-**Note**: The [test](https://community.ipfire.org/uploads/short-url/znjX2snktgFccQiem20CbYeky3z.tar) version of the RPZ add-on is installed manually until approved by the IPFire Developers.
+**Note**: The test version of the RPZ add-on is installed manually.
 
-Copy the `rpz-beta-0.1.nn-nn.ipfire.tar` file to the `/opt/pakfire/tmp/` directory.  **Please speak up if you need assistance with this!**
+**Please speak up if you need assistance with this!**
 
-Then:
+Steps to install:
 ```bash
 # 1 - set filename
-fileName="rpz-beta-0.1.nn-nn.ipfire.tar"
+#fileName="rpz-beta-0.1.nn-nn.ipfire.tar"
+fileName="rpz-beta-0.1.18-18.ipfire.tar"
 
 # 2 - go to this directory:
 cd /opt/pakfire/tmp/
 
-# 3 - download file
-wget https://github.com/JonMurphy/RPZ/raw/refs/heads/main/"${fileName}"
+# 3 - download file (still experimenting)
+curl --silent --show-error --location https://github.com/JonMurphy/RPZ/raw/refs/heads/main/"${fileName}" -o rpz.ipfire
 
 # 4 - uncompress the file:
 tar xvf "${fileName}"
 
 # 5 - check to make sure there are files there:
-ls -l /opt/pakfire/tmp
+ls -l
 
 # 6 - copy this one file to a new location
 /bin/cp --verbose ROOTFILES /opt/pakfire/db/rootfiles/rpz
@@ -51,7 +52,6 @@ To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**:
 <p align="center">
   <img width="800" alt="rpz_webgui_menu" src="images/rpz_webgui_menu.png" />
 </p>
-
 
 ## Zonefiles section
 List of the Names, URLs, and a short Remark for each zonefile item.  There are 10 items maximum.  Too many lists will slow down Unbound and DNS.
