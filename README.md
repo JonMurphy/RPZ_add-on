@@ -1,21 +1,17 @@
 # Response Policy Zones (RPZ)
 
-*** DRAFT *** work in progress *** DRAFT *** work in progress *** DRAFT *****
+**DRAFT : work in progress**
 
 The Response Policy Zone (RPZ) is a mechanism that enables the definition of local policies in a standardized manner and facilitates the loading of policies from external sources. [^1]
 
 The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics (there are no plans to add the pretty graphics).
 
-**Note**: Domains blocked by RPZ are not DROPped or REJECTed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
+Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
 
 
 ## Installation
 
-**Note**: The test version of the RPZ add-on is installed manually.
-
-**Please speak up if you need assistance with this!**
-
-Steps to install:
+The RPZ add-on (test version) is installed manually.  To install follow these steps:
 ```bash
 # 1 - set filename
 #fileName="rpz-beta-0.1.nn-nn.ipfire.tar"
@@ -53,6 +49,7 @@ To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**:
   <img width="700" alt="rpz_webgui_menu" src="docs/images/rpz_webgui_menu.png" />
 </p>
 
+
 ## Zonefiles section
 List of the Names, URLs, and a short Remark for each zonefile item.  There are 10 items maximum.  Too many lists will slow down Unbound and DNS.
 
@@ -67,7 +64,6 @@ To add a new RPZ list click on **Add** in the lower right corner of the Zonefile
 </p>
 
 Add a Name and the URL of a RPZ list.  A small remark can also be added.  Then click **Save**.
-![](./rpz_edit_zonefiles_entry.png "example Edit window")
 
 <p align="center">
   <img width="800" src="docs/images/rpz_edit_zonefiles_entry.png" alt="rpz_edit_zonefiles_entry" />
@@ -75,7 +71,7 @@ Add a Name and the URL of a RPZ list.  A small remark can also be added.  Then c
   <small><em>example Edit window</em></small>
 </p>
 
-Multiple adds or edits can be done at one time (before clicking **Apply**)
+Multiple adds or edits can be done at one time before clicking **Apply**.
 
 **Note**: Remember to press **Apply** after you have finished your modifications.  The **Apply** sends an `unbound-control reload` which loads the various RPZ configuration files.
 
@@ -95,14 +91,12 @@ Click on the pencil (Edit) on the needed line.
 </p>
 
 Make the needed changes and then click **Save**.
+
 <p align="center">
   <img width="800" src="docs/images/rpz_edit_zonefiles_entry.png" alt="rpz_edit_zonefiles_entry" />
   <br />
   <small><em>click on Save after edit</em></small>
 </p>
-
--=-=-=-=-=-=-=-=-=-=-=-=-
-
 
 Multiple adds or edits can be done at one time (before clicking **Apply**)
 
@@ -114,40 +108,60 @@ Multiple adds or edits can be done at one time (before clicking **Apply**)
   <small><em>Do not forget to click Apply</em></small>
 </p>
 
+
 ## Custom lists section
 List of allowlist domains and blocklist domain.  Loads the custom allow/block list into unbound RPZ. 
 
-![](docs/images/rpz_custom_lists.png "example custom lists")
-Domains are in this format:
-```
-*.com
-*.domain.com
-*.sub-domain.domain.com
-*.sub.sub-domain.domain.com
+<p align="center">
+  <img width="800" src="docs/images/rpz_custom_lists.png" alt="rpz_custom_lists" />
+  <br />
+  <small><em>example custom lists</em></small>
+</p>
 
-domain.com
-sub-domain.com
-sub.sub-domain.domain.com
+
+Domains are entered in this format:
 ```
+domain.com
+subdomain.domain.com
+
+# to include all subdomains within a domain, add the "*" to the start of the line
+*.domain.com
+*.subdomain.domain.com
+```
+
+**Note**: the asterisks `*` is only allowed as the first character in the line.   It represents all subdomains within a given domain.
 
 ### Allowlist
-At times an outside RPZ list will block a needed website. Allowed items can be added to this list.
+At times an outside RPZ list will block a needed website. Allowed items can be added to this list and this unblocks that domain.
 
 ### Blocklist
-The block list operates in a similar way as the allowlist.
+The block list operates in a similar way as the allowlist. Make the needed changes to the custom allow/block lists and then click **Save**.
 
-Make the needed changes to the custom allow/block lists and then click **Save**.
-![](docs/images/rpz_custom_save2.png)
+<p align="center">
+  <img width="800" src="docs/images/rpz_custom_save2.png" alt="rpz_custom_save" />
+  <br />
+  <small><em>click on Save after edit</em></small>
+</p>
 
 Multiple adds or edits can be done at one time (before clicking **Apply**)
 
 **Note**: Remember to press **Apply** after you have finished your modifications.
-![](docs/images/rpz_custom_apply2.png "do not forget to click Apply")
 
+<p align="center">
+  <img width="800" src="docs/images/rpz_custom_apply2.png" alt="rpz_custom_apply" />
+  <br />
+  <small><em>click on Apply</em></small>
+</p>
 
 ##  Logging
 RPZ logging can be found in the unbound logs.  Go to **Logs** > **Systems Logs**, then click on **DNS: Unbound** in the drop-down, and then click the **Update** button.
-![](docs/images/system_log_unbound_rpz.png "example of RPZ in system logs")
+
+<p align="center">
+  <img width="800" src="docs/images/system_log_unbound_rpz.png" alt="system_log_unbound_rpz" />
+  <br />
+  <small><em>example of RPZ in system logs</em></small>
+</p>
+
 
 ### Notes
  1. Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 500,000 lines of RPZ files (total lines for all RPZ files) is discouraged. Over 1,000,000 lines of RPZ files (total lines for all RPZ files) is NOT recommended.
