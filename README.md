@@ -192,7 +192,7 @@ RPZ logging can be found within the unbound logs.  Go to **Logs** > **Systems Lo
  1. [Hagezi - DNS Blocklists](https://github.com/hagezi/dns-blocklists?tab=readme-ov-file#zap-dns-blocklists---for-a-better-internet)
  2. [ThreatFox - DNS Response Policy Zone (RPZ)](https://threatfox.abuse.ch/export/#rpz)
  3. [URLHaus - DNS Response Policy Zone (RPZ)](https://urlhaus.abuse.ch/api/#rpz)
- 4. [jpgpi250 - DNS block list for DoH](https://github.com/jpgpi250/piholemanual/blob/master/DOH/DOH.rpz)
+ 4. [jpgpi250 - DNS block list for DoH](https://github.com/jpgpi250/piholemanual)
 
 
 ## RPZ console commands
