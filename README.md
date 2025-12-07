@@ -50,7 +50,7 @@ The RPZ WebGUI is here thanks to Leo Hofmann!
 To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**:
 
 <p align="center">
-  <img width="800" alt="rpz_webgui_menu" src="images/rpz_webgui_menu.png" />
+  <img width="700" alt="rpz_webgui_menu" src="docs/images/rpz_webgui_menu.png" />
 </p>
 
 ## Zonefiles section
@@ -58,34 +58,66 @@ List of the Names, URLs, and a short Remark for each zonefile item.  There are 1
 
 ### Add new line
 To add a new RPZ list click on **Add** in the lower right corner of the Zonefiles section. 
-![](./rpz_add_apply1.png "click Add")
+
+<p align="center">
+  <img width="800" src="docs/images/rpz_add.png" alt="rpz_add" />
+  <br />
+  <small><em>click Add</em></small>
+  <br />
+</p>
 
 Add a Name and the URL of a RPZ list.  A small remark can also be added.  Then click **Save**.
 ![](./rpz_edit_zonefiles_entry.png "example Edit window")
 
+<p align="center">
+  <img width="800" src="docs/images/rpz_edit_zonefiles_entry.png" alt="rpz_edit_zonefiles_entry" />
+  <br />
+  <small><em>example Edit window</em></small>
+</p>
+
 Multiple adds or edits can be done at one time (before clicking **Apply**)
 
 **Note**: Remember to press **Apply** after you have finished your modifications.  The **Apply** sends an `unbound-control reload` which loads the various RPZ configuration files.
-![](./rpz_apply.png "Do not forget to click Apply")
+
+<p align="center">
+  <img width="800" src="docs/images/rpz_apply.png" alt="rpz_apply" />
+  <br />
+  <small><em>Do not forget to click Apply</em></small>
+</p>
 
 ### Edit an existing line
 Click on the pencil (Edit) on the needed line.
-![](./rpz_zonefile_item.png)
 
-Make the needed changes and  then click **Save**.
-![](./rpz_edit_zonefiles_entry.png "example Edit window")
+<p align="center">
+  <img width="800" src="docs/images/rpz_zonefile_item.png" alt="rpz_zonefile_item" />
+  <br />
+  <small><em>click on pencil</em></small>
+</p>
+
+Make the needed changes and then click **Save**.
+<p align="center">
+  <img width="800" src="docs/images/rpz_edit_zonefiles_entry.png" alt="rpz_edit_zonefiles_entry" />
+  <br />
+  <small><em>click on Save after edit</em></small>
+</p>
+
+-=-=-=-=-=-=-=-=-=-=-=-=-
+
 
 Multiple adds or edits can be done at one time (before clicking **Apply**)
 
 **Note**: Remember to press **Apply** after you have finished your modifications. The **Apply** sends an `unbound-control reload` which loads the various RPZ configuration files.
 
-![](./rpz_apply.png "Do not forget to click Apply")
-
+<p align="center">
+  <img width="800" src="docs/images/rpz_apply.png" alt="rpz_apply" />
+  <br />
+  <small><em>Do not forget to click Apply</em></small>
+</p>
 
 ## Custom lists section
 List of allowlist domains and blocklist domain.  Loads the custom allow/block list into unbound RPZ. 
 
-![](./rpz_custom_lists.png "example custom lists")
+![](docs/images/rpz_custom_lists.png "example custom lists")
 Domains are in this format:
 ```
 *.com
@@ -105,17 +137,17 @@ At times an outside RPZ list will block a needed website. Allowed items can be a
 The block list operates in a similar way as the allowlist.
 
 Make the needed changes to the custom allow/block lists and then click **Save**.
-![](./rpz_custom_save2.png)
+![](docs/images/rpz_custom_save2.png)
 
 Multiple adds or edits can be done at one time (before clicking **Apply**)
 
 **Note**: Remember to press **Apply** after you have finished your modifications.
-![](./rpz_custom_apply2.png "do not forget to click Apply")
+![](docs/images/rpz_custom_apply2.png "do not forget to click Apply")
 
 
 ##  Logging
 RPZ logging can be found in the unbound logs.  Go to **Logs** > **Systems Logs**, then click on **DNS: Unbound** in the drop-down, and then click the **Update** button.
-![](./system_log_unbound_rpz.png "example of RPZ in system logs")
+![](docs/images/system_log_unbound_rpz.png "example of RPZ in system logs")
 
 ### Notes
  1. Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 500,000 lines of RPZ files (total lines for all RPZ files) is discouraged. Over 1,000,000 lines of RPZ files (total lines for all RPZ files) is NOT recommended.
