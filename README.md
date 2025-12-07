@@ -196,8 +196,7 @@ RPZ logging can be found within the unbound logs.  Go to **Logs** > **Systems Lo
 
 
 ## RPZ console commands
-See the RPZ console commands here --> [Using the RPZ Console](./rpzconsole)
-
+See the RPZ console commands here --> [Using the RPZ Console](docs/rpz_console.md)
 
 ## Links
  * [dnsrpz.info - DNS Response Policy Zones](https://dnsrpz.info)
