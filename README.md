@@ -30,7 +30,7 @@ ls -l
 
 NAME=rpz ./install.sh
 # -or-
-NAME=rpz ./install.sh
+NAME=rpz ./update.sh
 ```
 
 
