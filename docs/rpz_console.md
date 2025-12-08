@@ -41,12 +41,8 @@ rpz-config add MxLightHZ https://raw.githubusercontent.com/hagezi/dns-blocklists
 rpz-config remove MxLightHZ
 ```
 
-IMAGE
-
-![](docs/images/rpz-config.png "example rpz-config command")
-
 <p align="center">
-  <img width="780" src="docs/images/rpz-config.png" alt="rpz-config" />
+  <img width="900" src="images/rpz-config.png" alt="rpz-config" />
   <br />
   <small><em>example rpz-config command</em></small>
   <br />
@@ -77,12 +73,8 @@ Sometimes outside RPZ lists will block a needed website.  Allowed items can be a
 
 Edit the `/var/ipfire/dns/rpz/allowlist` and add the needed websites:
 
-IMAGE
-
-![](docs/images/rpz_allow.png "example allowlist")
-
 <p align="center">
-  <img width="780" src="docs/images/rpz_allow.png" alt="rpz_allow" />
+  <img width="900" src="images/rpz_allow.png" alt="rpz_allow" />
   <br />
   <small><em>example allowlist</em></small>
   <br />
@@ -91,12 +83,8 @@ IMAGE
 ### Block list
 The block list operates in a similar way as the allow list and is located at `/var/ipfire/dns/rpz/blocklist`:
 
-IMAGE
-
-![](docs/images/rpz_block.png "example blocklist")
-
 <p align="center">
-  <img width="780" src="docs/images/rpz_block.png" alt="rpz_block" />
+  <img width="900" src="images/rpz_block.png" alt="rpz_block" />
   <br />
   <small><em>example blocklist</em></small>
   <br />
@@ -120,12 +108,8 @@ Option to sort:
   --active-all	include enabled lists and disabled list in results
 ```
 
-IMAGE
-
-![](docs/images/rpz_metrics.png "example metrics")
-
 <p align="center">
-  <img width="780" src="docs/images/rpz_metrics.png" alt="rpz_metrics" />
+  <img width="900" src="images/rpz_metrics.png" alt="rpz_metrics" />
   <br />
   <small><em>example metrics</em></small>
   <br />
@@ -139,28 +123,20 @@ Usage: 	rpz-sleep <sleep time>
     default <sleep time> is 5 minutes
 ```
 
-IMAGE
-
-![](docs/images/rpz_sleep.png "example sleep rpz")
-
 <p align="center">
-  <img width="780" src="docs/images/rpz-config.png" alt="rpz-config" />
+  <img width="900" src="images/rpz_sleep.png" alt="rpz_sleep.png" />
   <br />
-  <small><em>example rpz-config command</em></small>
+  <small><em>example rpz_sleep command</em></small>
   <br />
 </p>
 
 ##  Logging
 RPZ logging can be found in the unbound logs.  Go to **Logs** > **Systems Logs**, then click on **DNS: Unbound** in the drop-down, and then click the **Update** button.
 
-IMAGE
-
-![](docs/images/system_log_unbound_rpz.png "example of RPZ in system logs")
-
 <p align="center">
-  <img width="780" src="docs/images/rpz-config.png" alt="rpz-config" />
+  <img width="900" src="images/system_log_unbound_rpz.png" alt="system_log_unbound_rpz" />
   <br />
-  <small><em>example rpz-config command</em></small>
+  <small><em>example of RPZ in system logs</em></small>
   <br />
 </p>
 
