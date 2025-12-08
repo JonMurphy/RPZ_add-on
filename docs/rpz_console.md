@@ -41,8 +41,16 @@ rpz-config add MxLightHZ https://raw.githubusercontent.com/hagezi/dns-blocklists
 rpz-config remove MxLightHZ
 ```
 
-![](./rpz-config.png "example rpz-config command")
+IMAGE
 
+![](docs/images/rpz-config.png "example rpz-config command")
+
+<p align="center">
+  <img width="780" src="docs/images/rpz-config.png" alt="rpz-config" />
+  <br />
+  <small><em>example rpz-config command</em></small>
+  <br />
+</p>
 
 ## Custom allow list or block list via "rpz-make"
 The `rpz-make` script loads the custom allow/block list into unbound RPZ.
@@ -69,12 +77,30 @@ Sometimes outside RPZ lists will block a needed website.  Allowed items can be a
 
 Edit the `/var/ipfire/dns/rpz/allowlist` and add the needed websites:
 
-![](./rpz_allow.png "example allowlist")
+IMAGE
+
+![](docs/images/rpz_allow.png "example allowlist")
+
+<p align="center">
+  <img width="780" src="docs/images/rpz_allow.png" alt="rpz_allow" />
+  <br />
+  <small><em>example allowlist</em></small>
+  <br />
+</p>
 
 ### Block list
 The block list operates in a similar way as the allow list and is located at `/var/ipfire/dns/rpz/blocklist`:
 
-![](./rpz_block.png "example blocklist")
+IMAGE
+
+![](docs/images/rpz_block.png "example blocklist")
+
+<p align="center">
+  <img width="780" src="docs/images/rpz_block.png" alt="rpz_block" />
+  <br />
+  <small><em>example blocklist</em></small>
+  <br />
+</p>
 
 ## Metrics of RPZ usage via "rpz-metrics"
 The `rpz-metrics` script searches the message logs for RPZ names and sorts the result (default sort is NAME).  Selecting all message logs (1 year or 53 message log files) may take ~60 seconds to complete.
@@ -94,7 +120,16 @@ Option to sort:
   --active-all	include enabled lists and disabled list in results
 ```
 
-![](./rpz_metrics.png "example metrics")
+IMAGE
+
+![](docs/images/rpz_metrics.png "example metrics")
+
+<p align="center">
+  <img width="780" src="docs/images/rpz_metrics.png" alt="rpz_metrics" />
+  <br />
+  <small><em>example metrics</em></small>
+  <br />
+</p>
 
 ### Pause RPZ for N time via "rpz-sleep"
 Pause for NUMBER seconds. SUFFIX may be 's' for seconds, 'm' for minutes, 'h' for hours or 'd' for days.
@@ -104,13 +139,30 @@ Usage: 	rpz-sleep <sleep time>
     default <sleep time> is 5 minutes
 ```
 
-![](./rpz_sleep.png "example sleep rpz")
+IMAGE
 
+![](docs/images/rpz_sleep.png "example sleep rpz")
+
+<p align="center">
+  <img width="780" src="docs/images/rpz-config.png" alt="rpz-config" />
+  <br />
+  <small><em>example rpz-config command</em></small>
+  <br />
+</p>
 
 ##  Logging
 RPZ logging can be found in the unbound logs.  Go to **Logs** > **Systems Logs**, then click on **DNS: Unbound** in the drop-down, and then click the **Update** button.
-![](./system_log_unbound_rpz.png "example of RPZ in system logs")
 
+IMAGE
+
+![](docs/images/system_log_unbound_rpz.png "example of RPZ in system logs")
+
+<p align="center">
+  <img width="780" src="docs/images/rpz-config.png" alt="rpz-config" />
+  <br />
+  <small><em>example rpz-config command</em></small>
+  <br />
+</p>
 
 ### Notes
  1. Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 500,000 lines of RPZ files (total lines for all RPZ files) is discouraged. Over 1,000,000 lines of RPZ files (total lines for all RPZ files) is NOT recommended.
