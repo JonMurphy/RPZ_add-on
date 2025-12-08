@@ -18,5 +18,3 @@ ls -l
 /bin/cp --verbose ROOTFILES /opt/pakfire/db/rootfiles/rpz  # need force here??
 
 NAME=rpz ./install.sh
-# -or-
-NAME=rpz ./install.sh
