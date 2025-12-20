@@ -1,4 +1,4 @@
 # Make build tree
-The folders above correspond to the locations (folders) within a IPFire make build.
+The folders above corresponds to the locations (folders) within a IPFire make build.
 
-<img width="680" height="1122" alt="build_tree" src="https://github.com/user-attachments/assets/39c94317-6cee-4de8-93ee-8c880fa6cfb9" />
+<img width="665" height="628" alt="Screenshot 2025-12-20 at 10 43 28 AM" src="https://github.com/user-attachments/assets/5144ffe9-2735-4f38-a8fa-84f13d1e9286" />
