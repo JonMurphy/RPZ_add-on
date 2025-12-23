@@ -1,27 +1,42 @@
 #!/bin/bash
-###############################################################################
-#                                                                             #
-#  IPFire.org - A linux based firewall                                        #
-#  Copyright (C) 2024  IPFire Team  <info@ipfire.org>                         #
-#                                                                             #
-#  This program is free software: you can redistribute it and/or modify       #
-#  it under the terms of the GNU General Public License as published by       #
-#  the Free Software Foundation, either version 3 of the License, or          #
-#  (at your option) any later version.                                        #
-#                                                                             #
-#  This program is distributed in the hope that it will be useful,            #
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of             #
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
-#  GNU General Public License for more details.                               #
-#                                                                             #
-#  You should have received a copy of the GNU General Public License          #
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                             #
-###############################################################################
+set -o errexit -o nounset -o pipefail
 
-version="2025-01-20 - v25"
+version="2025-12-21 - v29"
 
-###############       Main        ###############
+##############################     Functions     ##############################
+# Extract hit count for RPZ zone from pre-computed "name count" list
+get_rpz_hits() {
+    local name=$1
+    local rpzNameCount=$2
+    grep "^${name}\s" <<< "${rpzNameCount}" | awk '{print $2}' || echo "n/a"
+}
+
+# Extract CNAME line count for RPZ zone from pre-computed file:count list
+get_rpz_lines() {
+    local name=$1
+    local cnameCount=$2
+	grep --fixed-strings "/${name}.rpz" <<< "${cnameCount}" | awk -F: '{print $2}' || echo "n/a"
+}
+
+# Extract last modified date for RPZ zone from pre-computed "date file" list
+get_rpz_moddate() {
+    local name=$1
+    local modDateList=$2
+    grep --fixed-strings "/${name}.rpz" <<< "${modDateList}" | awk '{ print $1 }' || echo "n/a"
+}
+
+# Check if RPZ zone is active (loaded + non-empty)
+is_rpz_list_active() {
+    local name=$1
+    local ucListAuthZones=$2
+    local cnameCount=$3
+	#	  Require it in list_auth_zones and have non-zero CNAME count
+    grep --quiet "^${name}\.rpz" <<< "${ucListAuthZones}" && \
+        ! grep --quiet "/${name}\.rpz:0$" <<< "${cnameCount}"
+}
+
+
+################################     Main     ################################
 
 weeks="2"                   #   default to two message logs
 sortBy="name"               #   default "by name"
@@ -29,62 +44,66 @@ rpzActive="enabled"         #   default "enabled only"
 
 while [[ $# -gt 0 ]] ; do
     case "$1" in
-        --by-names | --by-name | name )				sortBy="name"   ;;
+        --by-names | --by-name | name )				sortBy="name"		;;
 
-        --by-hits | --by-hit | hits | hit )     	sortBy="hit"    ;;
+        --by-hits | --by-hit | hits | hit )     	sortBy="hit"		;;
 
-        --by-lines | --by-line | lines | line )    	sortBy="line"   ;;
+        --by-lines | --by-line | lines | line )    	sortBy="line"		;;
 
-        --by-effect )								sortBy="effect"   ;;
+        --by-effect )								sortBy="effect" 	;;
 
         --enabled-only )            				rpzActive="enabled" ;;
 
         --active-all | --all | all )      			rpzActive="all"     ;;
 
-        [0-9] | [0-9][0-9] )        				weeks=$1        ;;
+        [0-9] | [0-9][0-9] )        				weeks=$1			;;
+
+        *)	echo "Unknown option: $1" >&2 ; exit 1						;;
+
     esac
     shift       # Shift after checking all the cases to get next option
 done
 
 #  get the list of message logs for N weeks
-messageLogs=$( find /var/log/messages* -type f | sort --version-sort |
-    head -"${weeks}" )
+readarray -t messageLogs < <(
+    find /var/log -maxdepth 1 -name 'messages*' -type f |
+    sort --version-sort |
+    head -"${weeks}")
 
-#  get the list of RPZ names & counts from the message log(s)
-rpzNameCount=$( for logf in ${messageLogs} ; do
-    zgrep --text --fixed-strings 'info: rpz: applied' "${logf}" |
-      awk '$10 ~ /\[\w*]/ { print $10 }' ;
-    done | sort | uniq --count )
+# #  get the list of RPZ names & counts from the message log(s)
+rpzNameCount=$(
+  printf '%s\0' "${messageLogs[@]}" |
+  xargs -0 zgrep --text --fixed-strings 'info: rpz: applied' |
+  awk '$10 ~ /\[\w*]/ { print $10 }' |
+    sort |
+    uniq --count
+)
 
-#  flip results and remove brackets `[` and `]`
-rpzNameCount=$( echo "${rpzNameCount}" |
+#  flip results and remove brackets [ and ]
+rpzNameCount=$(
+	echo "${rpzNameCount}" |
     awk '{ print $2, $1 }' |
     sed --regexp-extended 's|^\[(.*)\]|\1|' )
+
+#  get list of RPZ files
+readarray -t rpzFileList < <( find /etc/unbound/zonefiles -type f -iname '*.rpz' )
+
+#  get basename of those files
+rpzBaseNames=$(
+    printf '%s\n' "${rpzFileList[@]}" |
+    sed 's|/etc/unbound/zonefiles/||g ; s|\.rpz||g ;' )
 
 #  grab only names
 rpzNames=$( echo "${rpzNameCount}" | awk '{ print $1 }' )
 
-#  get list of RPZ files
-rpzFileList=$( find /etc/unbound/zonefiles -type f -iname "*.rpz" )
+#  add to rpzNames and drop duplicate names
+rpzNames=$( echo "${rpzNames}"$'\n'"${rpzBaseNames}" | sort --unique )
 
-#  get basename of those files
-rpzBaseNames=$( echo "${rpzFileList}" |
-    sed 's|/etc/unbound/zonefiles/||g ; s|\.rpz||g ;' )
-
-#  add to rpzNames
-rpzNames="${rpzNames}"$'\n'"${rpzBaseNames}"
-
-#  drop duplicate names
-rpzNames=$( echo "${rpzNames}" | sort --unique  )
-
-#  get line count for each RPZ
-lineCount=$( echo "${rpzFileList}" | xargs wc -l )
-
-#  get comment line count and blank line count for each RPZ
-commentCount=$( echo "${rpzFileList}" | xargs grep --count -e "^$" -e "^;" )
+#  get CNAME count for each RPZ list
+cnameCount=$( grep --count --fixed-strings ' CNAME ' -- "${rpzFileList[@]}" )
 
 #  get modified date each RPZ
-modDateList=$( echo "${rpzFileList}" | xargs stat -c '%.10y  %n' )
+modDateList=$( stat -c '%.10y  %n' -- "${rpzFileList[@]}" )
 
 ucListAuthZones=$( unbound-control list_auth_zones )
 
@@ -94,47 +113,38 @@ pFormat="%-${pWidth}s %-8s %-8s %8s %12s %12s\n"
 
 #  print title line
 printf "${pFormat}" "name" "hits" "active" "lines" " hits/line" "last download"
-printf -- "--------------"
+printf -- "----------------------------------------------------------------------\n"
 
 theResults=""
 totalLines=0
 totalHits=0
-while read -r theName
-do
-    printf -- "--"        #   pretend progress bar
 
-    #  is this RPZ list active?
-    theActive="disabled"
-    if grep --quiet "^${theName}\.rpz" <<< "${ucListAuthZones}"
-    then
+while read -r theName ; do
+	#  is this RPZ list active?
+    if is_rpz_list_active "${theName}" "${ucListAuthZones}" "${cnameCount}"; then
         theActive="enabled"
     else
+        theActive="disabled"
+		# 	When rpzActive=all: include disabled zones + their hit counts in totals
         [[ "${rpzActive}" == enabled ]] && continue
     fi
 
-    #  get hit count
-    theHits="0"
-    if output=$( grep "^${theName}\s" <<< "${rpzNameCount}" ) ; then
-        theHits=$( echo "${output}" | awk '{ print $2 }' )
-        totalHits=$(( totalHits + theHits ))
-    fi
+	#  get hit count for the RPZ name.  Only reaches here if: enabled OR rpzActive=all
+	theHits=$(get_rpz_hits "${theName}" "${rpzNameCount}")
 
-    #  get line count
-    theLines="n/a"
-    hitsPerLine="0"
-    if output=$( grep --fixed-strings "/${theName}.rpz" <<< "${lineCount}" ) ; then
-        theLines=$( echo "${output}" | awk '{ print $1 }' )
-        totalLines=$(( totalLines + theLines ))
+    #  get line count for the RPZ name
+	theLines=$(get_rpz_lines "${theName}" "${cnameCount}")
 
-        if [[ "${theLines}" -gt 2 ]] ; then
-            hitsPerLine=$(( 100 * theHits / theLines ))
-        fi
-    fi
+    #  get modification date for the RPZ name
+    theModDate=$(get_rpz_moddate "${theName}" "${modDateList}")
 
-    #  get modification date
-    theModDate="n/a"
-    if output=$( grep --fixed-strings "/${theName}.rpz" <<< "${modDateList}" ) ; then
-        theModDate=$( echo "${output}" | awk '{ print $1 }' )
+	#  total it up
+	[[ "${theHits}" != "n/a" ]] && totalHits=$(( totalHits + theHits ))
+	[[ "${theLines}" != "n/a" ]] && totalLines=$(( totalLines + theLines ))
+
+    hitsPerLine="n/a"
+    if [[ "${theLines}" != "n/a" && "${theHits}" != "n/a" && "${theLines}" -gt 2 ]]; then
+        hitsPerLine=$(( 100 * theHits / theLines ))
     fi
 
     #  add to results list
@@ -154,9 +164,11 @@ case "${sortBy}" in
 
     #  sort by "active" then by "effect" then by "name"
     effect) sortArg=(-k3,3r -k5,5nr -k1,1)	;;
+
+	# default to name
+	*) sortArg=(-k3,3r -k1,1) ;;
 esac
 
-printf -- "--------------\n"
 #  remove blank lines, sort, print as columns
 echo "${theResults}" |
     awk '!/^[[:space:]]*$/' |
