@@ -1,8 +1,7 @@
 #!/bin/bash
 ###############################################################################
 #                                                                             #
-#  IPFire.org - A linux based firewall                                        #
-#  Copyright (C) 2024-2025  IPFire Team  <info@ipfire.org>                    #
+#  Copyright (C) 2024-2026  RPZ Team                                          #
 #                                                                             #
 #  This program is free software: you can redistribute it and/or modify       #
 #  it under the terms of the GNU General Public License as published by       #
@@ -19,11 +18,11 @@
 #                                                                             #
 ###############################################################################
 
-version="2025-01-11 - v44"
+versions="2026-02-17 - v45"
 
 ###############     Functions     ###############
 
-source /usr/sbin/rpz-functions
+source "/usr/sbin/rpz-functions"
 
 ###############       Main        ###############
 
@@ -66,25 +65,19 @@ case "${rpzAction}" in
             exit 105
         fi
 
-        #  create the zone config file
-        {
-        echo "rpz:"
-        echo "    name:                   ${rpzName}.rpz"
-        echo "    zonefile:               ${rpzFile}"
-        echo "    url:                    ${rpzURL}"
-        echo "    rpz-action-override:    nxdomain"
-        echo "    rpz-log:                ${rpzLog}"
-        echo "    rpz-log-name:           ${rpzName}"
-        echo "    rpz-signal-nxdomain-ra: yes"
-        } > "${rpzConfig}"
+    	echo "rpz:
+    name:                   ${rpzName}
+    zonefile:               ${rpzFile}
+    rpz-action-override:    nxdomain
+    rpz-log:                ${rpzLog}
+    rpz-log-name:           ${rpzName}
+    rpz-signal-nxdomain-ra: yes" > "${rpzConfig}"
 
         #  set-up zonefile
         #    create an empty rpz file if it does not exist
-        if [[ ! -f "${rpzFile}" ]] ; then
-            touch "${rpzFile}"
-            #  unbound requires these settings for rpz files
-            set_permissions "${rpzFile}" "${rpzConfig}"
-        fi
+		touch "${rpzFile}"
+		#  unbound requires these settings for rpz files
+		set_permissions "${rpzFile}" "${rpzConfig}"
         ;;
 
     #  trash config file & rpz file
@@ -118,8 +111,8 @@ case "${rpzAction}" in
 
     * )
         msg_log "error: rpz: missing or incorrect parameter"
-        printf "Usage:   $(basename "$0") <ACTION> <NAME> <URL> <OPTION> <OPTION>\n"
-        printf "Version: ${version}\n"
+		printf "Usage:   $(basename "$0") [ACTION] [NAME] [URL] [OPTION] [OPTION]\n"
+        printf "Version: ${versions}\n"
         exit 108
         ;;
 
