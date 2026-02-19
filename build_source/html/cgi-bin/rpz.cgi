@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 ###############################################################################
 #                                                                             #
-#  Copyright (C) 2024-2026  RPZ Team                                          #
+# IPFire.org - A linux based firewall                                         #
+# Copyright (C) 2005-2024  IPFire Team  <info@ipfire.org>                     #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU General Public License as published by        #
@@ -208,7 +209,7 @@ sub _zonefiles_load {
 		chomp($row);
 
 		# Use regex instead of split() to skip non-matching lines
-		next unless($row =~ /^([a-zA-Z0-9\.-]+)=(.+)$/);
+		next unless($row =~ /^(\w+)=(.+)$/);
 		my ($name, $url) = ($1, $2);
 
 		# Unique names are already guaranteed by rpz-config
@@ -455,7 +456,7 @@ sub _print_zonefile_editor {
 <table width="100%">
 	<tr>
 		<td width="20%">$Lang::tr{'name'}:&nbsp;<img src="/blob.gif" alt="*"></td>
-		<td><input type="text" name="ZF_NAME" value="$cgiparams{'ZF_NAME'}" size="40" maxlength="32" title="$Lang::tr{'rpz zf remark info'}" pattern="[a-zA-Z0-9\.-]{1,32}" required></td>
+		<td><input type="text" name="ZF_NAME" value="$cgiparams{'ZF_NAME'}" size="40" maxlength="32" title="$Lang::tr{'rpz zf remark info'}" pattern="[a-zA-Z0-9_]{1,32}" required></td>
 	</tr>
 	<tr>
 		<td width="20%">URL:&nbsp;<img src="/blob.gif" alt="*"></td>
@@ -863,7 +864,7 @@ sub _rpz_validate_zonefile {
 	my ($name, $url, $remark, $unique) = @_;
 	$unique //= 1;
 
-	unless($name =~ /^[a-zA-Z0-9\.-]{1,32}$/) {
+	unless($name =~ /^[a-zA-Z0-9_]{1,32}$/) {
 		return 101;
 	}
 	unless($url =~ /^[\w+\.:;\/\\&@#%?=\-~|!]{1,128}$/) {
