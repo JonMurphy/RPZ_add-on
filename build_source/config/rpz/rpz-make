@@ -1,8 +1,7 @@
 #!/bin/bash
 ###############################################################################
 #                                                                             #
-#  IPFire.org - A linux based firewall                                        #
-#  Copyright (C) 2024-2025  IPFire Team  <info@ipfire.org>                    #
+#  Copyright (C) 2024-2026  RPZ Team                                          #
 #                                                                             #
 #  This program is free software: you can redistribute it and/or modify       #
 #  it under the terms of the GNU General Public License as published by       #
@@ -19,71 +18,69 @@
 #                                                                             #
 ###############################################################################
 
-version="2025-01-11 - v14"
+versions="2026-02-18 - v15"
 
 ###############     Functions     ###############
 
-source /usr/sbin/rpz-functions
+source "/usr/sbin/rpz-functions"
 
-#   create the config file for allow
-make_allow_config () {
-    local theLog="${1:-yes}"                            #  log default ON
-    local theConfig="/etc/unbound/local.d/00-rpz.conf"  #  output zone conf file
-    local theList="/var/ipfire/dns/rpz/allowlist"       #  input custom list of domains
+#   create the RPZ config file for either "allow" or "block"
+make_rpz_config () {
+    local theName="${1-block}"
+    local theLog="${2:-yes}"                            #  log default ON
 
-    msg_log "info: rpz: make config file \"00-rpz.conf\""
+    local theRPZfile="/etc/unbound/zonefiles/${theName}.rpz"
+    local theList="/var/ipfire/dns/rpz/${theName}list"
 
-    echo "server:
-    module-config: \"respip validator iterator\"" > "${theConfig}"
+    #  type-specific values
+    local theConfFile theAction
+    case "${theName}" in
+        allow)
+            theConfFile="/etc/unbound/local.d/00-rpz.conf"
+            theAction="passthru"
+            ;;
+        block)
+            theConfFile="/etc/unbound/local.d/block.rpz.conf"
+            theAction="nxdomain"
+            ;;
+        *)
+            msg_log "error: make_rpz_config: unknown type '${theName}'" >&2
+            return 1
+            ;;
+    esac
 
-    #  does allow list exist?
-    if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
+    msg_log "info: rpz: make config file '$(basename "${theConfFile}")'"
 
-    echo "rpz:
-    name:                   allow.rpz
-    zonefile:               /etc/unbound/zonefiles/allow.rpz
-    rpz-action-override:    passthru
-    rpz-log:                ${theLog}
-    rpz-log-name:           allow
-    rpz-signal-nxdomain-ra: yes" >> "${theConfig}"
-
+	: > "${theConfFile}"
+    #  allow needs a server: header written
+    if [[ "${theName}" == "allow" ]]; then
+        echo "server:
+    module-config: \"respip validator iterator\"" > "${theConfFile}"
     fi
 
-    #  set-up zonefile - unbound requires these settings for rpz files
-    set_permissions "${theConfig}"
-}
+    #  does the list exist and contain at least one entry?
+    if [[ -s "${theList}" ]] && grep -q . "${theList}"; then
 
-#   create the config file for block
-make_block_config () {
-    local theLog="${1:-yes}"                                #  log default ON
-    local theConfig="/etc/unbound/local.d/block.rpz.conf"   #  output zone conf file
-    local theList="/var/ipfire/dns/rpz/blocklist"           #  input custom list of domains
-
-    msg_log "info: rpz: make config file \"block.rpz.conf\""
-
-    #  does block list exist?
-    if [[ -s "${theList}" ]] && grep -q . "${theList}" ; then
-
-    echo "rpz:
-    name:                   block.rpz
-    zonefile:               /etc/unbound/zonefiles/block.rpz
-    rpz-action-override:    nxdomain
+        echo "rpz:
+    name:                   ${theName}
+    zonefile:               ${theRPZfile}
+    rpz-action-override:    ${theAction}
     rpz-log:                ${theLog}
-    rpz-log-name:           block
-    rpz-signal-nxdomain-ra: yes" > "${theConfig}"
+    rpz-log-name:           ${theName}
+    rpz-signal-nxdomain-ra: yes" >> "${theConfFile}"
 
-        #  set-up zonefile - unbound requires these settings for rpz files
-        set_permissions "${theConfig}"
-    else
-        #   no - trash the config file
-        rm --verbose /etc/unbound/local.d/block.rpz.conf
+        set_permissions "${theConfFile}"
+
+    elif [[ "${theName}" == "block" ]]; then
+        #  no block list – remove the stale config so unbound won't error
+        rm --verbose "${theConfFile}"
     fi
 }
 
 #   create an RPZ file for allow or block
 make_rpz_file () {
     local theName="${1}"        #   allow or block
-    local theAction='.'         # the default is nxdomain or block
+    local theAction='.'         # the default is nxdomain (a.k.a block)
     local actionList
 
     local theList="/var/ipfire/dns/rpz/${theName}list"         #  input custom list of domains
@@ -97,9 +94,9 @@ make_rpz_file () {
 
         #  drop any extra "blanks" and add "CNAME <RPZ action>." to each line
         actionList=$( awk '{$1=$1};1' "${theList}" |
-            sed "/^[^;].*[[:alnum:]]/ s|$|  CNAME   ${theAction}|" )
+            sed "/^[^;].*[[:alnum:]]/ s|$|	CNAME	${theAction}|" )
 
-        msg_log "info: rpz: create zonefile for \"${theName}list\""
+        msg_log "info: rpz: create zonefile for '${theName}list'"
 
 echo "; Name:             ${theName} list
 ; Last modified:    $(date "+%Y-%m-%d at %H.%M.%S %Z")
@@ -163,20 +160,20 @@ case "${rpzName}" in
     #  make a new allow or block rpz file
 
     allow )
-        validate_list 'allow'           #   is the allowlist valid?
-        make_allow_config "${rpzLog}"
+        validate_list 'allow'           #  is the allow list valid?
+        make_rpz_config 'allow' "${rpzLog}"
         make_rpz_file 'allow'
         ;;
 
     allowblock )
-        validate_list 'allow'           #   is the list valid?
-        make_allow_config "${rpzLog}"
+        validate_list 'allow'           #  is the allow list valid?
+        make_rpz_config 'allow' "${rpzLog}"
         make_rpz_file 'allow'
-        ;&
+        ;&								#  drop thru to next
 
     block )
-        validate_list 'block'           #   is the blocklist valid?
-        make_block_config "${rpzLog}"
+        validate_list 'block'           #  is the blocklist valid?
+        make_rpz_config 'block' "${rpzLog}"
         make_rpz_file 'block'
         ;;
 
@@ -193,7 +190,7 @@ case "${rpzName}" in
     * )
         msg_log "error: rpz: missing or incorrect parameter"
         printf "Usage:   $(basename "$0") <NAME> <OPTION> <OPTION>\n"
-        printf "Version: ${version}\n"
+        printf "Version: ${versions}\n"
         exit 108
         ;;
 esac

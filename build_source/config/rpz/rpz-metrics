@@ -1,28 +1,47 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 
-version="2025-12-21 - v29"
+###############################################################################
+#                                                                             #
+#  Copyright (C) 2024-2026  RPZ Team                                          #
+#                                                                             #
+#  This program is free software: you can redistribute it and/or modify       #
+#  it under the terms of the GNU General Public License as published by       #
+#  the Free Software Foundation, either version 3 of the License, or          #
+#  (at your option) any later version.                                        #
+#                                                                             #
+#  This program is distributed in the hope that it will be useful,            #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#  GNU General Public License for more details.                               #
+#                                                                             #
+#  You should have received a copy of the GNU General Public License          #
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                             #
+###############################################################################
+
+version="2026-02-18 - v31"
 
 ##############################     Functions     ##############################
 # Extract hit count for RPZ zone from pre-computed "name count" list
 get_rpz_hits() {
     local name=$1
     local rpzNameCount=$2
-    grep "^${name}\s" <<< "${rpzNameCount}" | awk '{print $2}' || echo "n/a"
+    grep "^${name}\s" <<< "${rpzNameCount}" | awk '{print $2}' || echo "0"
 }
 
 # Extract CNAME line count for RPZ zone from pre-computed file:count list
 get_rpz_lines() {
     local name=$1
     local cnameCount=$2
-	grep --fixed-strings "/${name}.rpz" <<< "${cnameCount}" | awk -F: '{print $2}' || echo "n/a"
+	grep --fixed-strings "/${name}.rpz:" <<< "${cnameCount}" | awk -F: '{print $2}' || echo "n/a"
 }
 
 # Extract last modified date for RPZ zone from pre-computed "date file" list
 get_rpz_moddate() {
     local name=$1
     local modDateList=$2
-    grep --fixed-strings "/${name}.rpz" <<< "${modDateList}" | awk '{ print $1 }' || echo "n/a"
+    grep "/${name}.rpz$" <<< "${modDateList}" | awk '{ print $1 }' || echo "n/a"
 }
 
 # Check if RPZ zone is active (loaded + non-empty)
@@ -30,15 +49,14 @@ is_rpz_list_active() {
     local name=$1
     local ucListAuthZones=$2
     local cnameCount=$3
-	#	  Require it in list_auth_zones and have non-zero CNAME count
-    grep --quiet "^${name}\.rpz" <<< "${ucListAuthZones}" && \
+	# Require it in list_auth_zones and have non-zero CNAME count
+    grep -E --quiet "^${theName}(\.rpz\.|\.)?\s" <<< "${ucListAuthZones}" && \
         ! grep --quiet "/${name}\.rpz:0$" <<< "${cnameCount}"
 }
 
-
 ################################     Main     ################################
 
-weeks="2"                   #   default to two message logs
+weeks="4"                   #   default to two message logs
 sortBy="name"               #   default "by name"
 rpzActive="enabled"         #   default "enabled only"
 
@@ -49,8 +67,6 @@ while [[ $# -gt 0 ]] ; do
         --by-hits | --by-hit | hits | hit )     	sortBy="hit"		;;
 
         --by-lines | --by-line | lines | line )    	sortBy="line"		;;
-
-        --by-effect )								sortBy="effect" 	;;
 
         --enabled-only )            				rpzActive="enabled" ;;
 
@@ -70,14 +86,13 @@ readarray -t messageLogs < <(
     sort --version-sort |
     head -"${weeks}")
 
-# #  get the list of RPZ names & counts from the message log(s)
+#  get the list of RPZ names & counts from the message log(s)
 rpzNameCount=$(
   printf '%s\0' "${messageLogs[@]}" |
   xargs -0 zgrep --text --fixed-strings 'info: rpz: applied' |
-  awk '$10 ~ /\[\w*]/ { print $10 }' |
+  awk '$10 ~ /\[[a-zA-Z0-9.-]*\]/ { print $10 }'|
     sort |
-    uniq --count
-)
+    uniq --count)
 
 #  flip results and remove brackets [ and ]
 rpzNameCount=$(
@@ -85,13 +100,14 @@ rpzNameCount=$(
     awk '{ print $2, $1 }' |
     sed --regexp-extended 's|^\[(.*)\]|\1|' )
 
-#  get list of RPZ files
-readarray -t rpzFileList < <( find /etc/unbound/zonefiles -type f -iname '*.rpz' )
+#  get list of RPZ files in /etc/unbound directory
+readarray -t rpzFileList < <(
+	find /etc/unbound/zonefiles -type f \( -iname "*.rpz" -o -iname "*.zone" \) )
 
 #  get basename of those files
 rpzBaseNames=$(
     printf '%s\n' "${rpzFileList[@]}" |
-    sed 's|/etc/unbound/zonefiles/||g ; s|\.rpz||g ;' )
+    sed 's|/etc/unbound/zonefiles/||g ; s|\.rpz$||g ; s|\.zone$||g ;' )
 
 #  grab only names
 rpzNames=$( echo "${rpzNameCount}" | awk '{ print $1 }' )
@@ -107,13 +123,16 @@ modDateList=$( stat -c '%.10y  %n' -- "${rpzFileList[@]}" )
 
 ucListAuthZones=$( unbound-control list_auth_zones )
 
-#  get width of RPZ names
-pWidth=$( echo "${rpzNames}" | awk '{ print $1"   " }' | wc -L )
-pFormat="%-${pWidth}s %-8s %-8s %8s %12s %12s\n"
+#  widths of every column
+cName=$( echo "${rpzNames}" | awk '{ print $1" " }' | wc -L )
+cHits=10  ; cActive=12 ; cLines=10 ; cDate=14
 
-#  print title line
-printf "${pFormat}" "name" "hits" "active" "lines" " hits/line" "last download"
-printf -- "----------------------------------------------------------------------\n"
+pFormat="%-${cName}s %${cHits}s %${cActive}s %${cLines}s %${cDate}s\n"
+
+#  print title line and dash line
+printf "${pFormat}" "name" "hits" "active" "lines" "last download"
+totalWidth=$((cName + cHits + cActive + cLines + cDate + 5))
+printf "%${totalWidth}s\n" | tr ' ' '-'
 
 theResults=""
 totalLines=0
@@ -139,44 +158,38 @@ while read -r theName ; do
     theModDate=$(get_rpz_moddate "${theName}" "${modDateList}")
 
 	#  total it up
-	[[ "${theHits}" != "n/a" ]] && totalHits=$(( totalHits + theHits ))
+	totalHits=$(( totalHits + theHits ))
 	[[ "${theLines}" != "n/a" ]] && totalLines=$(( totalLines + theLines ))
 
-    hitsPerLine="n/a"
-    if [[ "${theLines}" != "n/a" && "${theHits}" != "n/a" && "${theLines}" -gt 2 ]]; then
-        hitsPerLine=$(( 100 * theHits / theLines ))
-    fi
-
     #  add to results list
-    theResults+="${theName} ${theHits} ${theActive} ${theLines} ${hitsPerLine} ${theModDate}"$'\n'
-
+    theResults+="${theName} ${theHits} ${theActive} ${theLines} ${theModDate}"$'\n'
 done <<< "${rpzNames}"
 
 case "${sortBy}" in
     #  sort by "active" then by "name"
-    name) sortArg=(-k3,3r -k1,1)			;;
+    name) sortArg=("-k3,3r" "-k1,1")				;;
 
     #  sort by "active" then by "hits" then by "name"
-    hit)  sortArg=(-k3,3r -k2,2nr -k1,1)	;;
+    hit)  sortArg=("-k3,3r" "-k2,2nr" "-k1,1")		;;
 
     #  sort by "active" then by "lines" then by "name"
-    line) sortArg=(-k3,3r -k4,4nr -k1,1)	;;
+    line) sortArg=("-k3,3r" "-k4,4nr" "-k1,1")		;;
 
     #  sort by "active" then by "effect" then by "name"
-    effect) sortArg=(-k3,3r -k5,5nr -k1,1)	;;
+    effect) sortArg=("-k3,3r" "-k5,5nr" "-k1,1")	;;
 
 	# default to name
-	*) sortArg=(-k3,3r -k1,1) ;;
+	*) sortArg=("-k3,3r" "-k1,1") ;;
 esac
 
-#  remove blank lines, sort, print as columns
+# Sort and print the results
 echo "${theResults}" |
     awk '!/^[[:space:]]*$/' |
-    sort "${sortArg[@]}"    |
-    awk --assign=width="${pWidth}" \
-        '{ printf "%-*s %-8s %-8s %8s %10s %% %12s\n", width, $1, $2, $3, $4, $5, $6 }'
+    sort "${sortArg[@]}"	|
+    awk -v cN1="${cName}" -v cH2="${cHits}" -v cA3="${cActive}" -v cL4="${cLines}" -v cD5="${cDate}" \
+        '{ printf "%-*s %*s %*s %*s %*s\n", cN1, $1, cH2, $2, cA3, $3, cL4, $4, cD5, $5 }'
 
-printf "${pFormat}" "" "=======" "" "========" "" ""
-printf "${pFormat}" "Totals -->" "${totalHits}" "" "${totalLines}" "" ""
+printf "%-${cName}s %${cHits}s %$((cActive + cLines +1))s\n" "" "=========" "========="
+printf "%-${cName}s %'${cHits}d %'$((cActive + cLines + 1))d\n" "Totals -->" "${totalHits}" "${totalLines}"
 
 exit
