@@ -18,7 +18,7 @@
 #                                                                             #
 ###############################################################################
 
-versions="2026-02-17 - v45"
+versions="2026-02-24 - v46"
 
 ###############     Functions     ###############
 
@@ -65,9 +65,10 @@ case "${rpzAction}" in
             exit 105
         fi
 
-    	echo "rpz:
+        echo "rpz:
     name:                   ${rpzName}
     zonefile:               ${rpzFile}
+    url:                    ${rpzURL}
     rpz-action-override:    nxdomain
     rpz-log:                ${rpzLog}
     rpz-log-name:           ${rpzName}
@@ -75,9 +76,9 @@ case "${rpzAction}" in
 
         #  set-up zonefile
         #    create an empty rpz file if it does not exist
-		touch "${rpzFile}"
-		#  unbound requires these settings for rpz files
-		set_permissions "${rpzFile}" "${rpzConfig}"
+        touch "${rpzFile}"
+        #  unbound requires these settings for rpz files
+        set_permissions "${rpzFile}" "${rpzConfig}"
         ;;
 
     #  trash config file & rpz file
@@ -111,7 +112,7 @@ case "${rpzAction}" in
 
     * )
         msg_log "error: rpz: missing or incorrect parameter"
-		printf "Usage:   $(basename "$0") [ACTION] [NAME] [URL] [OPTION] [OPTION]\n"
+        printf "Usage:   $(basename "$0") [ACTION] [NAME] [URL] [OPTION] [OPTION]\n"
         printf "Version: ${versions}\n"
         exit 108
         ;;
