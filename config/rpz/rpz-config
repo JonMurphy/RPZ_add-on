@@ -98,7 +98,7 @@ case "${rpzAction}" in
         ;;
 
     list )
-        awk -F':' '/^\s*name:/{ gsub(/[[:blank:]]|\.rpz/, "",$2) ; NAME=$2 } \
+        awk -F':' '/^\s*name:/{ gsub(/[[:blank:]]|\.rpz$/, "",$2) ; NAME=$2 } \
             /^\s*url:/{ gsub(/[[:blank:]]/, "") ; print NAME"="$2":"$3} '  \
             /etc/unbound/local.d/*rpz.conf
         exit
