@@ -56,7 +56,7 @@ is_rpz_list_active() {
 
 ################################     Main     ################################
 
-weeks="4"                   #   default to two message logs
+weeks="2"                   #   default to two message logs
 sortBy="name"               #   default "by name"
 rpzActive="enabled"         #   default "enabled only"
 
