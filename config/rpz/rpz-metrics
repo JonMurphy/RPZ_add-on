@@ -20,7 +20,7 @@ set -o errexit -o nounset -o pipefail
 #                                                                             #
 ###############################################################################
 
-version="2026-02-18 - v31"
+version="2026-02-26 - v32"
 
 ##############################     Functions     ##############################
 # Extract hit count for RPZ zone from pre-computed "name count" list
@@ -101,13 +101,12 @@ rpzNameCount=$(
     sed --regexp-extended 's|^\[(.*)\]|\1|' )
 
 #  get list of RPZ files in /etc/unbound directory
-readarray -t rpzFileList < <(
-	find /etc/unbound/zonefiles -type f \( -iname "*.rpz" -o -iname "*.zone" \) )
+readarray -t rpzFileList < <( find /etc/unbound/zonefiles -type f -iname '*.rpz' )
 
 #  get basename of those files
 rpzBaseNames=$(
     printf '%s\n' "${rpzFileList[@]}" |
-    sed 's|/etc/unbound/zonefiles/||g ; s|\.rpz$||g ; s|\.zone$||g ;' )
+    sed 's|/etc/unbound/zonefiles/||g ; s|\.rpz$||g ;' )
 
 #  grab only names
 rpzNames=$( echo "${rpzNameCount}" | awk '{ print $1 }' )
@@ -116,7 +115,7 @@ rpzNames=$( echo "${rpzNameCount}" | awk '{ print $1 }' )
 rpzNames=$( echo "${rpzNames}"$'\n'"${rpzBaseNames}" | sort --unique )
 
 #  get CNAME count for each RPZ list
-cnameCount=$( grep --count --fixed-strings ' CNAME ' -- "${rpzFileList[@]}" )
+cnameCount=$( grep --count -P '[ \t]CNAME[ \t]' -- "${rpzFileList[@]}" )
 
 #  get modified date each RPZ
 modDateList=$( stat -c '%.10y  %n' -- "${rpzFileList[@]}" )
