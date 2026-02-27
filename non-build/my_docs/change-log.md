@@ -1,5 +1,41 @@
 # Change Log
 
+## rpz-0.1.20.20.ipfire on 2025-02-26
+
+#### rpz.cgi:
+ - update "name" to include periods and not just alphanumeric
+ - update copyright date and update version info
+
+#### rpz-config and rpz-make:
+ - update rpz config template
+ - add missing url line in config template
+ - combine make_allow_config & make_block_config into one function
+ - replace code formatting tabs with spaces
+ - add anchor to list awk command
+ - update copyright date and update version info
+
+#### rpz-metrics
+ - update "name" to include periods and not just alphanumeric
+ - remove effectiveness argument and "hits/line" column
+ - add new column width functions
+ - remove pretend progress bar
+ - change cname count to search for spaces and tabs
+ - update copyright date and update version info
+
+#### rpz-functions
+ - update regex pattern to include period
+ - update copyright date and update version info
+
+#### rpz-sleep
+ - update copyright date and update version info
+
+
+## rpz-0.1.19.19.ipfire on 2025-12-21
+ - not distributed
+
+#### rpz-metrics
+- update enabled/disabled flag for allow and block lists.  Thank you @cbrown
+
 
 ## rpz-beta-0.1.18-18.ipfire on 2025-02-01
 
