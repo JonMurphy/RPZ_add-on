@@ -10,27 +10,30 @@ Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Fir
 
 
 ## Installation
-
 The RPZ add-on (test version) is installed manually.  To install enter these commands:
 
-```bash
-fileName="rpz-beta-0.1.18-18.ipfire"
+```
+# 0 - Copy attached `rpz-n.nnn-nn.ipfire.tar` file to the `/opt/pakfire/tmp/` directory on your IPFire device.
 
+# 1 - go to this directory:
 cd /opt/pakfire/tmp/
 
-curl --silent --show-error --location \
-  --url https://github.com/JonMurphy/RPZ/raw/refs/heads/main/"${fileName}.tar" \
-  --output "${fileName}"
+# 2 - list the directory and confirm file exists
+ls -l /opt/pakfire/tmp
 
-tar --extract --verbose --file="${fileName}" 
+# 3 - uncompress the file:
+tar --extract --verbose --file="rpz-n.nnn-nn.ipfire.tar"
 
-ls -l
+# 4 - check to make sure there are five(5) files there:
+ls -l /opt/pakfire/tmp
 
-/bin/cp --verbose ROOTFILES /opt/pakfire/db/rootfiles/rpz  # need force here??
+# 5 - copy this one file to a new location
+/bin/cp --verbose ROOTFILES /opt/pakfire/db/rootfiles/rpz
 
+# 6 - install (or update or uninstall) RPZ
 NAME=rpz ./install.sh
-# -or-
-NAME=rpz ./update.sh
+# -or-  NAME=rpz ./update.sh
+# -or-  NAME=rpz ./uninstall.sh
 ```
 
 
@@ -46,7 +49,7 @@ To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**:
 View list of RPZ Names, URLs, and a short Remark for each zonefile item. Too many RPZ lists will slow down Unbound DNS.
 
 ### Add
-To add a new RPZ list click the **Add** button in the lower right corner of the Zonefiles section. 
+To add a new RPZ list click the **Add** button in the lower right corner of the Zonefiles section.
 
 <p align="center">
   <img width="780" src="docs/images/rpz_add.png" alt="rpz_add" />
@@ -102,7 +105,7 @@ Multiple adds or edits can be done at one time (before clicking **Apply**)
 
 
 ## Custom lists section
-List of allowlist domains and blocklist domains.  Clicking apply loads the custom allowlist abd blocklist into unbound RPZ. 
+List of allowlist domains and blocklist domains.  Clicking apply loads the custom allowlist abd blocklist into unbound RPZ.
 
 <p align="center">
   <img width="800" src="docs/images/rpz_custom_lists.png" alt="rpz_custom_lists" />
