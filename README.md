@@ -13,25 +13,25 @@ Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Fir
 The RPZ add-on (test version) is installed manually.  To install enter these commands:
 
 ```bash
-# 0 - Copy `rpz-n.nnn-nn.ipfire.tar` file to the `/opt/pakfire/tmp/` directory
-        on your IPFire device.
-
 # 1 - go to this directory:
 cd /opt/pakfire/tmp/
 
-# 2 - list the directory and confirm file exists
+# 2 - download rzp add-on file:
+curl --location https://github.com/JonMurphy/RPZ_add-on/releases/latest/download/rpz-latest.ipfire.tar -o rpz-latest.ipfire.tar
+
+# 3 - list the directory and confirm file exists:
 ls -l /opt/pakfire/tmp
 
-# 3 - uncompress the file:
-tar --verbose --extract --file="rpz-n.nnn-nn.ipfire.tar"
+# 4 - uncompress the file:
+tar --verbose --extract --file="rpz-latest.ipfire.tar"
 
-# 4 - check to make sure there are five(5) files there:
+# 5 - check to make sure there are five(5) files:
 ls -l /opt/pakfire/tmp
 
-# 5 - copy this one file to a new location
+# 6 - copy one file to a new location:
 /bin/cp --verbose --force ROOTFILES /opt/pakfire/db/rootfiles/rpz
 
-# 6 - install (or update or uninstall) RPZ
+# 7 - install (or update or uninstall) RPZ
 NAME=rpz ./install.sh
 # -or-    NAME=rpz ./update.sh
 # -or-    NAME=rpz ./uninstall.sh
