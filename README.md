@@ -1,115 +1,190 @@
-# RPZ - Response Policy Zones
-Response Policy Zone (RPZ) is a mechanism that makes it possible to define local policies in a standardised way and load  policies from external sources.  [^1].  
+# Response Policy Zones (RPZ)
 
-The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics.  (there are no plans to add the pretty grphics).
+**DRAFT : work in progress**
 
-Note: Domains blocked by RPZ are not DROPped or REJECTed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
+The Response Policy Zone (RPZ) is a mechanism that enables the definition of local policies in a standardized manner and facilitates the loading of policies from external sources. [^1]
+
+The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics (there are no plans to add the pretty graphics).
+
+Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
 
 
 ## Installation
-Note: The test version of the RPZ add-on is installed manually until approved by the IPFire Developers.  It is installed similar to this method:
-
-https://www.ipfire.org/docs/devel/ipfire-2-x/addon-howto#testing-the-install-uninstall-update-routines-and-add-on-itself
-
-<strike>
-	
-rpz can be installed with the Pakfire web interface or via the console:
+The RPZ add-on (test version) is installed manually.  To install enter these commands:
 
 ```bash
-pakfire install rpz
+# 0 - Copy `rpz-n.nnn-nn.ipfire.tar` file to the `/opt/pakfire/tmp/` directory
+        on your IPFire device.
+
+# 1 - go to this directory:
+cd /opt/pakfire/tmp/
+
+# 2 - list the directory and confirm file exists
+ls -l /opt/pakfire/tmp
+
+# 3 - uncompress the file:
+tar --verbose --extract --file="rpz-n.nnn-nn.ipfire.tar"
+
+# 4 - check to make sure there are five(5) files there:
+ls -l /opt/pakfire/tmp
+
+# 5 - copy this one file to a new location
+/bin/cp --verbose --force ROOTFILES /opt/pakfire/db/rootfiles/rpz
+
+# 6 - install (or update or uninstall) RPZ
+NAME=rpz ./install.sh
+# -or-    NAME=rpz ./update.sh
+# -or-    NAME=rpz ./uninstall.sh
 ```
-</strike>
 
 
 ## Usage
-There is no web interface for this add-on. 
- * **PS** - I need someone to assist with a WebGUI
+To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**:
 
-To run this add-on, open the serial console, or open the local terminal to access the IPFire box via SSH.  There are three simple scripts available for set-up:
-
-[rpz-config](RPZ%20wiki.md) - Create, remove or make an external RPZ file 
-
-[rpz-metrics](RPZ%20wiki.md) - Locates RPZ names from the message logs and sort by hits.
-
-[rpz-sleep](RPZ%20wiki.md) - Pause RPZ for a NUMBER of seconds (default 5 minutes).
+<p align="center">
+  <img width="700" alt="rpz_webgui_menu" src="docs/images/rpz_webgui_menu.png" />
+</p>
 
 
-## Create a config file for RPZ
-The `rpz-config` script assists in creating, deleting or builing RPZ files.
+## Zonefiles section
+View list of RPZ Names, URLs, and a short Remark for each zonefile item. Too many RPZ lists will slow down Unbound DNS.
 
+### Add
+To add a new RPZ list click the **Add** button in the lower right corner of the Zonefiles section.
+
+<p align="center">
+  <img width="780" src="docs/images/rpz_add.png" alt="rpz_add" />
+  <br />
+  <small><em>click Add</em></small>
+  <br />
+</p>
+
+Add a Name and the URL of a RPZ list.  A small remark can also be added.  Then click **Save**.
+
+<p align="center">
+  <img width="800" src="docs/images/rpz_edit_zonefiles_entry.png" alt="rpz_edit_zonefiles_entry" />
+  <br />
+  <small><em>example Edit window</em></small>
+</p>
+
+Multiple adds or edits can be done at one time before clicking **Apply**.
+
+**Note**: Remember to press **Apply** after you have finished your modifications.  The **Apply** sends an `unbound-control reload` which loads the various RPZ configuration files.
+
+<p align="center">
+  <img width="780" src="docs/images/rpz_apply.png" alt="rpz_apply" />
+  <br />
+  <small><em>Do not forget to click Apply</em></small>
+</p>
+
+### Edit
+To edit an existing line, click on the pencil.
+
+<p align="center">
+  <img width="780" src="docs/images/rpz_zonefile_item.png" alt="rpz_zonefile_item" />
+  <br />
+  <small><em>click on pencil</em></small>
+</p>
+
+Make the needed changes and then click **Save**.
+
+<p align="center">
+  <img width="800" src="docs/images/rpz_edit_zonefiles_entry.png" alt="rpz_edit_zonefiles_entry" />
+  <br />
+  <small><em>click on Save after edit</em></small>
+</p>
+
+Multiple adds or edits can be done at one time (before clicking **Apply**)
+
+**Note**: Remember to press **Apply** after you have finished your modifications. The **Apply** sends an `unbound-control reload` which loads the various RPZ configuration files.
+
+<p align="center">
+  <img width="780" src="docs/images/rpz_apply.png" alt="rpz_apply" />
+  <br />
+  <small><em>Do not forget to click Apply</em></small>
+</p>
+
+
+## Custom lists section
+List of allowlist domains and blocklist domains.  Clicking apply loads the custom allowlist abd blocklist into unbound RPZ.
+
+<p align="center">
+  <img width="800" src="docs/images/rpz_custom_lists.png" alt="rpz_custom_lists" />
+  <br />
+  <small><em>example custom lists</em></small>
+</p>
+
+
+Domains are entered in this format:
+
+```bash
+domain.com
+subdomain.domain.com
+
+# to include all subdomains within a domain, add the "*" to the start of the line
+*.domain.com
+*.subdomain.domain.com
 ```
-Usage: 	rpz-config  <action> <name> <url>
 
-Actions:
-add <name> <url>        adds new RPZ config file by RPZ name
-remove <name> <url>     removes unneeded RPZ files by RPZ name
-  <name>                unique alpha-numeric name for the RPZ file.  This name appears in the message log and
-                          is the basename for the config file. e.g., threatfox, urlhaus, PopUpAdsHZ
-  <url>                 URL for RPZ.  Must be in a format similar to https://example.com/path/filename.
-                          Other protocols such as file://, ftp://, etc. will not work.
-make <allow or block>   build the custom allow or block RPZ files
-```
+**Note**: the asterisk `*` is only allowed as the first character in the line.   It represents all subdomains within a given domain.
 
-Example commands:
-```
-rpz-config add MxLightHZ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/rpz/light.txt
+### Allowlist
+At times an outside RPZ list will block a needed website. Allowed domains can be added to this list and thus unblock that domain.
 
-rpz-config remove MxLightHZ
+### Blocklist
+The block list operates in a similar way as the allowlist. After making changes to the custom allow/block lists click **Save**.
 
-rpz-config make allow
-```
-Example response:
-<img width="977" alt="Screen Shot 2024-07-14 at 2 03 51 PM" src="https://github.com/user-attachments/assets/56c07e82-fbdf-41fb-b3d1-4ada298528c9">
+<p align="center">
+  <img width="800" src="docs/images/rpz_custom_save2.png" alt="rpz_custom_save" />
+  <br />
+  <small><em>click on Save after changes</em></small>
+</p>
 
-### Custom allow list or block list
-The `rpz-config make allow` script loads the custom allow list into unbound RPZ.
+Multiple adds or edits can be done at one time (before clicking **Apply**)
 
-#### Allow list
-Sometimes outside RPZ lists will block a needed website.  Allowed items can be added to this list.
+**Note**: Remember to press **Apply** after you have finished your modifications.
 
-Edit the `/var/ipfire/rpz/allowlist` and add the needed websites:
-<img width="981" alt="Screen Shot 2024-07-04 at 4 08 32 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/6c21e799-a3d5-4a6f-8c66-4875e51d0b7e">
+<p align="center">
+  <img width="800" src="docs/images/rpz_custom_apply2.png" alt="rpz_custom_apply" />
+  <br />
+  <small><em>click on Apply</em></small>
+</p>
 
-#### Block list
-The block list operates in a similar way as the allow list and is located at `/var/ipfire/rpz/blocklist`:
-<img width="977" alt="Screen Shot 2024-07-04 at 4 23 13 PM" src="https://github.com/JonMurphy/RPZ/assets/15616372/0a35b5e7-fb0e-413b-aaa7-cd9a5da3f969">
+##  Logging
+RPZ logging can be found within the unbound logs.  Go to **Logs** > **Systems Logs**, click on **DNS: Unbound** in the drop-down, and then click the **Update** button.
+
+<p align="center">
+  <img width="800" src="docs/images/system_log_unbound_rpz.png" alt="system_log_unbound_rpz" />
+  <br />
+  <small><em>example of RPZ in system logs</em></small>
+</p>
 
 
-## Metrics of RPZ usage
-The `rpz-metrics` script searches the message logs for RPZ names and sorts those names by the number of hits.  Selecting all message logs (1 year or 53 message log files) may take ~60 seconds to complete.
+### Notes
+ 1. Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 500,000 lines of RPZ files (total lines for all RPZ files) is discouraged. Over 1,000,000 lines of RPZ files (total lines for all RPZ files) is NOT recommended.
+    - the Hagezi Threat Intelligence Feed (largest size) is **NOT** recommended due to it's large size (lines = 1,354,431)
+        - Hagezi TIF medium or TIF mini should be fine.
+    - the Hagezi Gambling (largest size) is **NOT** recommended due to it's large size (lines = 937,035)
+        - Hagezi Gambling medium or Gambling mini should be fine.
 
-```
-Usage: 	rpz-metrics <number of message logs>
-    default <number of message logs> is 2
-```
-
-Example response:
-<img width="977" alt="Screen Shot 2024-07-14 at 1 51 28 PM" src="https://github.com/user-attachments/assets/ffde7e0f-1da5-4b3d-a2b3-b77c24c0231c">
-
-### Pause RPZ for N time
-Pause for NUMBER seconds. SUFFIX may be 's' for seconds, 'm' for minutes, 'h' for hours or 'd' for days.
-```
-Usage: 	rpz-sleep <sleep time>
-    default <sleep time> is 5 minutes
-```
-
-Example response:
-<img width="977" alt="Screen Shot 2024-07-14 at 2 25 17 PM" src="https://github.com/user-attachments/assets/7099e440-095f-4eb7-8962-b9943fc238af">
+ 2. Keep in mind there may be overlap between an RPZ list and a list offered in [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).  Please review the lists chosen before activating.
 
 
 ## Recommended RPZ lists
- 1. https://github.com/hagezi/dns-blocklists
- 2. https://threatfox.abuse.ch/export/#rpz
- 3. https://urlhaus.abuse.ch/api/#rpz
+ 1. [Hagezi - DNS Blocklists](https://github.com/hagezi/dns-blocklists?tab=readme-ov-file#zap-dns-blocklists---for-a-better-internet)
+ 2. [ThreatFox - DNS Response Policy Zone (RPZ)](https://threatfox.abuse.ch/export/#rpz)
+ 3. [URLHaus - DNS Response Policy Zone (RPZ)](https://urlhaus.abuse.ch/api/#rpz)
+ 4. [jpgpi250 - DNS block list for DoH](https://github.com/jpgpi250/piholemanual)
+
+
+## RPZ console commands
+See the RPZ console commands here --> [Using the RPZ Console](docs/rpz_console.md)
 
 
 ## Links
- * https://en.wikipedia.org/wiki/Response_policy_zone
- * https://unbound.docs.nlnetlabs.nl/en/latest/topics/filtering/rpz.html
- * https://github.com/jpgpi250/piholemanual/blob/master/doc/Unbound%20response%20policy%20zones.pdf
+ * [dnsrpz.info - DNS Response Policy Zones](https://dnsrpz.info)
+ * [Wikipedia - Response policy zone](https://en.wikipedia.org/wiki/Response_policy_zone)
+ * [unbound - Response Policy Zones](https://unbound.docs.nlnetlabs.nl/en/latest/topics/filtering/rpz.html)
 
-[^1]: https://unbound.docs.nlnetlabs.nl/en/latest/topics/filtering/rpz.html
 
-## Known issues
- * The current unbound bridge causes frequent unbound restarts and may cause the RPZ list updates to be delayed by a day or three.
- * Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 500,000 lines of RPZ files (total lines for all RPZ files) is discouraged. Over 1,000,000 lines of RPZ files (total lines for all RPZ files) is NOT recommended.
+[^1]: [https://unbound.docs.nlnetlabs.nl/en/latest/topics/filtering/rpz.html](https://unbound.docs.nlnetlabs.nl/en/latest/topics/filtering/rpz.html)
