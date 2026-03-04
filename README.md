@@ -13,7 +13,8 @@ Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Fir
 The RPZ add-on (test version) is installed manually.  To install enter these commands:
 
 ```
-# 0 - Copy attached `rpz-n.nnn-nn.ipfire.tar` file to the `/opt/pakfire/tmp/` directory on your IPFire device.
+# 0 - Copy `rpz-n.nnn-nn.ipfire.tar` file to the `/opt/pakfire/tmp/` directory
+        on your IPFire device.
 
 # 1 - go to this directory:
 cd /opt/pakfire/tmp/
@@ -124,7 +125,7 @@ subdomain.domain.com
 *.subdomain.domain.com
 ```
 
-**Note**: the asterisks `*` is only allowed as the first character in the line.   It represents all subdomains within a given domain.
+**Note**: the asterisk `*` is only allowed as the first character in the line.   It represents all subdomains within a given domain.
 
 ### Allowlist
 At times an outside RPZ list will block a needed website. Allowed domains can be added to this list and thus unblock that domain.
@@ -167,9 +168,6 @@ RPZ logging can be found within the unbound logs.  Go to **Logs** > **Systems Lo
 
  2. Keep in mind there may be overlap between an RPZ list and a list offered in [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).  Please review the lists chosen before activating.
 
- 3. Each RPZ file begins with a SOA record defining the update rate. Tests show that unbound defines a downcounter for the 'automagical' update of the file. A reload operation of unbound resets these counters. Therefore a reload period shorter than a specific update time disables the auto update of this RPZ file.
-    * Defining or removing RPZ config files restarts unbound!
-
 
 ## Recommended RPZ lists
  1. [Hagezi - DNS Blocklists](https://github.com/hagezi/dns-blocklists?tab=readme-ov-file#zap-dns-blocklists---for-a-better-internet)
@@ -180,6 +178,7 @@ RPZ logging can be found within the unbound logs.  Go to **Logs** > **Systems Lo
 
 ## RPZ console commands
 See the RPZ console commands here --> [Using the RPZ Console](docs/rpz_console.md)
+
 
 ## Links
  * [dnsrpz.info - DNS Response Policy Zones](https://dnsrpz.info)
