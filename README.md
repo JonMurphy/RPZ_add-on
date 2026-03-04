@@ -17,7 +17,9 @@ The RPZ add-on (test version) is installed manually.  To install enter these com
 cd /opt/pakfire/tmp/
 
 # 2 - download rzp add-on file:
-curl --location https://github.com/JonMurphy/RPZ_add-on/releases/latest/download/rpz-latest.ipfire.tar -o rpz-latest.ipfire.tar
+curl --location \
+  --url https://github.com/JonMurphy/RPZ_add-on/releases/latest/download/rpz-latest.ipfire.tar \
+  --output rpz-latest.ipfire.tar
 
 # 3 - list the directory and confirm file exists:
 ls -l /opt/pakfire/tmp
