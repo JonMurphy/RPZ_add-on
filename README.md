@@ -1,33 +1,51 @@
-# RPZ - Response Policy Zones
-Response Policy Zone (RPZ) is a mechanism that makes it possible to define local policies in a standardised way and load  policies from external sources.  [^1].  
+# Response Policy Zones (RPZ)
 
-The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics.  (there are no plans to add the pretty grphics).
+**DRAFT : work in progress**
 
-Note: Domains blocked by RPZ are not DROPped or REJECTed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
+Response Policy Zone (RPZ) is a mechanism that makes it possible to define local policies in a standardised way and load  policies from external sources.  [^1].
+
+The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics (there are no plans to add the pretty graphics).
+
+Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
 
 
 ## Installation
-Note: The test version of the RPZ add-on is installed manually until approved by the IPFire Developers.  It is installed similar to this method:
+The RPZ add-on (test version) is installed manually.  To install enter these commands:
 
-https://www.ipfire.org/docs/devel/ipfire-2-x/addon-howto#testing-the-install-uninstall-update-routines-and-add-on-itself
-
-<strike>
-	
-rpz can be installed with the Pakfire web interface or via the console:
-
-```bash
-pakfire install rpz
 ```
-</strike>
+# 0 - Copy attached `rpz-n.nnn-nn.ipfire.tar` file to the `/opt/pakfire/tmp/` directory on your IPFire device.
+
+# 1 - go to this directory:
+cd /opt/pakfire/tmp/
+
+# 2 - list the directory and confirm file exists
+ls -l /opt/pakfire/tmp
+
+# 3 - uncompress the file:
+tar --extract --verbose --file="rpz-n.nnn-nn.ipfire.tar"
+
+# 4 - check to make sure there are five(5) files there:
+ls -l /opt/pakfire/tmp
+
+# 5 - copy this one file to a new location
+/bin/cp --verbose ROOTFILES /opt/pakfire/db/rootfiles/rpz
+
+# 6 - install (or update or uninstall) RPZ
+NAME=rpz ./install.sh
+# -or-  NAME=rpz ./update.sh
+# -or-  NAME=rpz ./uninstall.sh
+
+```
+
 
 
 ## Usage
-There is no web interface for this add-on. 
+There is no web interface for this add-on.
  * **PS** - I need someone to assist with a WebGUI
 
 To run this add-on, open the serial console, or open the local terminal to access the IPFire box via SSH.  There are three simple scripts available for set-up:
 
-[rpz-config](RPZ%20wiki.md) - Create, remove or make an external RPZ file 
+[rpz-config](RPZ%20wiki.md) - Create, remove or make an external RPZ file
 
 [rpz-metrics](RPZ%20wiki.md) - Locates RPZ names from the message logs and sort by hits.
 
