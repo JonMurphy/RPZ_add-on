@@ -4,13 +4,13 @@
 
 The Response Policy Zone (RPZ) is a mechanism that enables the definition of local policies in a standardized manner and facilitates the loading of policies from external sources. [^1]
 
-The base functionality of RPZ blocking DNS is similar to piHole but without the pretty graphics (there are no plans to add the pretty graphics).
+The base functionality of RPZ blocking DNS is similar to Pi-hole but without the pretty graphics (there are no plans to add the pretty graphics).
 
-Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
+Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed, I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
 
 
 ## Installation
-The RPZ add-on (test version) is installed manually.  To install enter these commands:
+The RPZ add-on (test version) is installed manually.  To install, enter these commands:
 
 ```bash
 # 1 - go to this directory:
@@ -27,7 +27,7 @@ ls -l /opt/pakfire/tmp
 # 4 - uncompress the file:
 tar --verbose --extract --file="rpz-latest.ipfire.tar"
 
-# 5 - check to make sure there are five(5) files:
+# 5 - check to make sure there are five (5) files:
 ls -l /opt/pakfire/tmp
 
 # 6 - copy one file to a new location:
@@ -41,7 +41,7 @@ NAME=rpz ./install.sh
 
 
 ## Usage
-To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**:
+To open the RPZ WebGUI, go to menu **IPFire** > **Response Policy Zones (RPZ)**:
 
 <p align="center">
   <img width="700" alt="rpz_webgui_menu" src="docs/images/rpz_webgui_menu.png" />
@@ -49,10 +49,10 @@ To open the RPZ WebGUI go to menu **IPFire** > **Response Policy Zones (RPZ)**:
 
 
 ## Zonefiles section
-View list of RPZ Names, URLs, and a short Remark for each zonefile item. Too many RPZ lists will slow down Unbound DNS.
+View a list of RPZ Names, URLs, and a short Remark for each zonefile item. Too many RPZ lists will slow down Unbound DNS.
 
 ### Add
-To add a new RPZ list click the **Add** button in the lower right corner of the Zonefiles section.
+To add a new RPZ list, click the **Add** button in the lower right corner of the Zonefiles section.
 
 <p align="center">
   <img width="780" src="docs/images/rpz_add.png" alt="rpz_add" />
@@ -96,7 +96,7 @@ Make the needed changes and then click **Save**.
   <small><em>click on Save after edit</em></small>
 </p>
 
-Multiple adds or edits can be done at one time (before clicking **Apply**)
+Multiple adds or edits can be done at one time (before clicking **Apply**).
 
 **Note**: Remember to press **Apply** after you have finished your modifications. The **Apply** sends an `unbound-control reload` which loads the various RPZ configuration files.
 
@@ -108,7 +108,7 @@ Multiple adds or edits can be done at one time (before clicking **Apply**)
 
 
 ## Custom lists section
-List of allowlist domains and blocklist domains.  Clicking apply loads the custom allowlist abd blocklist into unbound RPZ.
+List of allowlist domains and blocklist domains.  Clicking apply loads the custom allowlist and blocklist into unbound RPZ.
 
 <p align="center">
   <img width="800" src="docs/images/rpz_custom_lists.png" alt="rpz_custom_lists" />
@@ -134,7 +134,7 @@ subdomain.domain.com
 At times an outside RPZ list will block a needed website. Allowed domains can be added to this list and thus unblock that domain.
 
 ### Blocklist
-The block list operates in a similar way as the allowlist. After making changes to the custom allow/block lists click **Save**.
+The block list operates in a similar way to the allowlist. After making changes to the custom allow/block lists, click **Save**.
 
 <p align="center">
   <img width="800" src="docs/images/rpz_custom_save2.png" alt="rpz_custom_save" />
@@ -142,7 +142,7 @@ The block list operates in a similar way as the allowlist. After making changes 
   <small><em>click on Save after changes</em></small>
 </p>
 
-Multiple adds or edits can be done at one time (before clicking **Apply**)
+Multiple adds or edits can be done at one time (before clicking **Apply**).
 
 **Note**: Remember to press **Apply** after you have finished your modifications.
 
@@ -152,7 +152,7 @@ Multiple adds or edits can be done at one time (before clicking **Apply**)
   <small><em>click on Apply</em></small>
 </p>
 
-##  Logging
+## Logging
 RPZ logging can be found within the unbound logs.  Go to **Logs** > **Systems Logs**, click on **DNS: Unbound** in the drop-down, and then click the **Update** button.
 
 <p align="center">
@@ -164,9 +164,9 @@ RPZ logging can be found within the unbound logs.  Go to **Logs** > **Systems Lo
 
 ### Notes
  1. Large RPZ files will slow down the unbound reload time and slow down a DNS lookup.  Over 500,000 lines of RPZ files (total lines for all RPZ files) is discouraged. Over 1,000,000 lines of RPZ files (total lines for all RPZ files) is NOT recommended.
-    - the Hagezi Threat Intelligence Feed (largest size) is **NOT** recommended due to it's large size (lines = 1,354,431)
+    - the Hagezi Threat Intelligence Feed (largest size) is **NOT** recommended due to its large size (lines = 1,354,431)
         - Hagezi TIF medium or TIF mini should be fine.
-    - the Hagezi Gambling (largest size) is **NOT** recommended due to it's large size (lines = 937,035)
+    - the Hagezi Gambling (largest size) is **NOT** recommended due to its large size (lines = 937,035)
         - Hagezi Gambling medium or Gambling mini should be fine.
 
  2. Keep in mind there may be overlap between an RPZ list and a list offered in [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).  Please review the lists chosen before activating.
