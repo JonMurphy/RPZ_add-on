@@ -1,12 +1,14 @@
 # Response Policy Zones (RPZ)
 
-**DRAFT : work in progress**
+The RPZ Add-on brings Response Policy Zone (RPZ) functionality to IPFire's built-in DNS resolver, Unbound. RPZ is a standardized mechanism for defining local DNS policies and loading them from external sources.  This is a similar approach used by standalone tools like Pi-hole, but integrated directly into IPFire itself rather than requiring a separate device on the network.
 
-The Response Policy Zone (RPZ) is a mechanism that enables the definition of local policies in a standardized manner and facilitates the loading of policies from external sources. [^1]
+In practice, this means admins can easily block access to harmful sites — phishing pages, malware servers, ad networks, and similar threats — by intercepting DNS lookups before a connection is attempted. Because malicious domain names tend to change far less frequently than the IP addresses behind them, DNS-level blocking is an efficient and low-maintenance first line of defense. 
 
-The base functionality of RPZ blocking DNS is similar to Pi-hole but without the pretty graphics (there are no plans to add the pretty graphics).
+It's worth noting that RPZ only blocks the domain name lookup; if a user connects directly via IP address, RPZ will not intervene. For IP-based blocking, [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist) are the appropriate companion tool.
 
-Domains blocked by RPZ are not **DROP**ped or **REJECT**ed like when using a Firewall Rule. RPZ only blocks the domain name lookup. If a user decides to enter an IP address to get to their favorite site, RPZ will not stop it from happening. If this is needed, I suggest using [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist).
+The RPZ add-on works by inserting roughly ten lines into Unbound's configuration (per list), along with a set of scripts that handle configuration of various RPZ sources and metrics. The extenal RPZ lists are downloaded by Unbound itself and the add-on's scripts are responsible only for configuration and setup.
+
+A local allowlist and blocklist are also included — the allowlist lets admins exempt legitimate sites that may be incorrectly flagged or need to stay accessible, while the blocklist allows for custom blocking rules on top of the external RPZ sources.
 
 
 ## Installation
@@ -192,11 +194,11 @@ See the RPZ console commands here --> [Using the RPZ Console](docs/rpz_console.m
 
 This effort, which began in mid-2023, involves numerous volunteers who have generously offered their guidance, time spent developing new code, time spent testing, and their overall and much appreciated support.  This is what a Community effort is all about!
 
-A thank you to Peter Russell @ jpgpi250 for his work, his PDF documents, and his time answering my newbie questions around RPZ.  His work is the inspiration for this project.
+ - A thank you to Peter Russell @ jpgpi250 for his work, his PDF documents, and his time answering my newbie questions around RPZ.  His work is the inspiration for this project.
 
-A thank you to Bernhard Bitsch @ bbitsch for his suggestions, BIG help with rpz-metrics, testing of the first versions (with detailed bug reports!), and kind words when I was down.
+ - A thank you to Bernhard Bitsch @ bbitsch for his suggestions, BIG help with rpz-metrics, testing of the first versions (with detailed bug reports!), and kind words when I was down.
 
-And an extra big "Thank you!" to the many volunteer testers.
+ - And an extra big "Thank you!" to the many volunteer testers.
 
 PS - There were many excellent options, enhancements, and additional functionality that were suggested along the way.  My apologies for not getting those implemented.
 
