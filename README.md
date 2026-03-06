@@ -194,7 +194,7 @@ See the RPZ console commands here --> [Using the RPZ Console](docs/rpz_console.m
 
 This effort, which began in mid-2023, involves numerous volunteers who have generously offered their guidance, time spent developing new code, time spent testing, and their overall and much appreciated support.  This is what a Community effort is all about!
 
- - A thank you to Peter Russell @ jpgpi250 for his work, his PDF documents, and his time answering my newbie questions around RPZ.  His work is the inspiration for this project.
+ - A thank you to [Peter Russell @ jpgpi250](https://github.com/jpgpi250/piholemanual)  for his work, his PDF documents, and his time answering my newbie questions around RPZ.  His work is the inspiration for this project.
 
  - A thank you to Bernhard Bitsch @ bbitsch for his suggestions, BIG help with rpz-metrics, testing of the first versions (with detailed bug reports!), and kind words when I was down.
 
