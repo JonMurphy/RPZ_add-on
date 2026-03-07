@@ -1,14 +1,14 @@
 # Response Policy Zones (RPZ)
 
-The RPZ Add-on brings Response Policy Zone (RPZ) functionality to IPFire's built-in DNS resolver, Unbound. RPZ is a standardized mechanism for defining local DNS policies and loading them from external sources.  This is a similar approach used by standalone tools like Pi-hole, but integrated directly into IPFire itself rather than requiring a separate device on the network.
+The RPZ Add-on enhances IPFire’s built-in DNS resolver, Unbound, by integrating Response Policy Zone (RPZ) functionality. RPZ is a standardized mechanism for defining local DNS policies and loading them from external sources. This approach is similar to standalone tools like Pi-hole but is integrated into IPFire, eliminating the need for a separate device on the network.
 
-In practice, this means admins can easily block access to harmful sites — phishing pages, malware servers, ad networks, and similar threats — by intercepting DNS lookups before a connection is attempted. Because malicious domain names tend to change far less frequently than the IP addresses behind them, DNS-level blocking is an efficient and low-maintenance first line of defense. 
+In practice, this means admins can easily block access to harmful sites — phishing pages, malware servers, ad networks, and similar threats — by intercepting DNS lookups before a connection is attempted. Since malicious domain names tend to change far less frequently than the IP addresses behind them, DNS-level blocking is an efficient and low-maintenance first line of defense. 
 
 It's worth noting that RPZ only blocks the domain name lookup; if a user connects directly via IP address, RPZ will not intervene. For IP-based blocking, [IP Address Blocklists](https://www.ipfire.org/docs/configuration/firewall/ipblocklist) are the appropriate companion tool.
 
-The RPZ add-on works by inserting roughly ten lines into Unbound's configuration (per list), along with a set of scripts that handle configuration of various RPZ sources and metrics. The extenal RPZ lists are downloaded by Unbound itself and the add-on's scripts are responsible only for configuration and setup.
+The RPZ add-on works by inserting roughly ten lines into Unbound's configuration (per list), along with a set of scripts that handle configuration of various RPZ sources and metrics. The external RPZ lists are downloaded by Unbound itself and the add-on's scripts are responsible only for configuration and setup.
 
-A local allowlist and blocklist are also included — the allowlist lets admins exempt legitimate sites that may be incorrectly flagged or need to stay accessible, while the blocklist allows for custom blocking rules on top of the external RPZ sources.
+A local allowlist and blocklist are also included — the allowlist lets admins exempt legitimate sites that may be incorrectly flagged and need to stay accessible. The blocklist allows for custom blocking rules on top of the external RPZ sources.
 
 
 ## Installation
@@ -18,7 +18,7 @@ The RPZ add-on (test version) is installed manually.  To install, enter these co
 # 1 - go to this directory:
 cd /opt/pakfire/tmp/
 
-# 2 - download rzp add-on file:
+# 2 - download RPZ add-on file:
 curl --location \
   --url https://github.com/JonMurphy/RPZ_add-on/releases/latest/download/rpz-latest.ipfire.tar \
   --output rpz-latest.ipfire.tar
