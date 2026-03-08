@@ -198,6 +198,8 @@ This effort, which began in mid-2023, involves numerous volunteers who have gene
 
  - A thank you to Bernhard Bitsch @ bbitsch for his suggestions, BIG help with rpz-metrics, testing of the first versions (with detailed bug reports!), and kind words when I was down.
 
+ - A thank you to Leo Hofmann @ luani for his coding efforts around the RPZ WebGUI (rpz.cgi).  I wish I could code like that!
+
  - And an extra big "Thank you!" to the many volunteer testers.
 
 PS - There were many excellent options, enhancements, and additional functionality that were suggested along the way.  My apologies for not getting those implemented.
