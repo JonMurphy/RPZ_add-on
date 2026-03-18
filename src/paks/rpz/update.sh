@@ -19,6 +19,16 @@
 #                                                                             #
 ###############################################################################
 #
+# Define NAME so functions.sh knows which manifest to use
+NAME="rpz"
+
+# Register the manifest in the Pakfire database FIRST
+# Logic: Mechanical necessity for future clean uninstalls.
+if [ -f "ROOTFILES" ]; then
+    cp -pf ROOTFILES /opt/pakfire/db/rootfiles/${NAME}
+fi
+
+# shellcheck source=/dev/null
 . /opt/pakfire/lib/functions.sh
 
 #  from update.sh
@@ -38,6 +48,15 @@ remove_files
 #  from install.sh
 extract_files
 restore_backup ${NAME}
+
+# Validate Unbound config before attempting start to avoid DNS blackout.
+if /usr/sbin/unbound-checkconf >/dev/null 2>&1; then
+    /etc/init.d/unbound start
+else
+    # Log the failure to system logs
+    logger -t "RPZ Update Error: Unbound config invalid. Manual intervention required."
+    printf "ERROR: Unbound configuration is invalid! Check /etc/unbound/\n"
+fi
 
 #	fix user created files
 chown --verbose --recursive nobody:nobody \

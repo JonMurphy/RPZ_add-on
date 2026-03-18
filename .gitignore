@@ -1,3 +1,16 @@
 README.md
 .DS_Store
 config/.DS_Store
+# Build artifacts
+build/
+*.ipfire
+*.sha256
+
+# Temporary staging area
+src_staging/
+
+# Internal payload
+files.tar.xz
+
+# Logs or temporary files
+*.log

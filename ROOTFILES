@@ -1,0 +1,24 @@
+# rpz manifest
+# Generated: Wed Mar 18 11:12:41 AM EET 2026
+
+etc/unbound/local.d/00-rpz.conf
+etc/unbound/zonefiles
+etc/unbound/zonefiles/allow.rpz
+etc/unbound/zonefiles/block.rpz
+srv/web/ipfire/cgi-bin/rpz.cgi
+usr/sbin/rpz-config
+usr/sbin/rpz-functions
+usr/sbin/rpz-make
+usr/sbin/rpz-metrics
+usr/sbin/rpz-sleep
+var/ipfire/addon-lang/rpz.de.pl
+var/ipfire/addon-lang/rpz.en.pl
+var/ipfire/addon-lang/rpz.es.pl
+var/ipfire/addon-lang/rpz.fr.pl
+var/ipfire/addon-lang/rpz.it.pl
+var/ipfire/addon-lang/rpz.tr.pl
+var/ipfire/backup/addons/includes/rpz
+var/ipfire/dns/rpz
+var/ipfire/dns/rpz/allowlist
+var/ipfire/dns/rpz/blocklist
+var/ipfire/menu.d/EX-rpz.menu

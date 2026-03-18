@@ -19,6 +19,16 @@
 #                                                                             #
 ###############################################################################
 #
+# Define NAME so functions.sh knows which manifest to use
+NAME="rpz"
+
+# Register the manifest in the Pakfire database FIRST
+# Logic: Mechanical necessity for future clean uninstalls.
+if [ -f "ROOTFILES" ]; then
+    cp -pf ROOTFILES /opt/pakfire/db/rootfiles/${NAME}
+fi
+
+# shellcheck source=/dev/null
 . /opt/pakfire/lib/functions.sh
 extract_files
 restore_backup ${NAME}

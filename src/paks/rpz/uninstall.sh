@@ -19,6 +19,10 @@
 #                                                                             #
 ###############################################################################
 #
+# Define NAME so functions.sh knows which manifest to use
+NAME="rpz"
+
+# shellcheck source=/dev/null
 . /opt/pakfire/lib/functions.sh
 
 #  stop unbound to delete RPZ conf file
